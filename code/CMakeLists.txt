@@ -28,7 +28,8 @@ SET(FINAL_PROJECT_INCLUDES
         include/sphere.hpp
         include/transform.hpp
         include/triangle.hpp
-        )
+        include/ray_tracing.hpp
+)
 
 SET(CMAKE_CXX_STANDARD 11)
 

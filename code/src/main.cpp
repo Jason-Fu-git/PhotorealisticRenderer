@@ -4,12 +4,14 @@
 #include <cstring>
 #include <cmath>
 #include <iostream>
+#include <vector>
 
 #include "scene_parser.hpp"
 #include "image.hpp"
 #include "camera.hpp"
 #include "group.hpp"
 #include "light.hpp"
+#include "ray_tracing.hpp"
 
 #include <string>
 
@@ -27,38 +29,27 @@ int main(int argc, char *argv[]) {
     string inputFile = argv[1];
     string outputFile = argv[2];  // only bmp is allowed.
 
-    // DONE: Main RayCasting Logic
     // First, parse the scene using SceneParser.
     SceneParser parser(inputFile.c_str());
     Camera *camera = parser.getCamera();
     Group *group = parser.getGroup();
     Image image(camera->getWidth(), camera->getHeight());
-    // Then loop over each pixel in the image, shooting a ray
-    // through that pixel and finding its intersection with
-    // the scene.  Write the color at the intersection to that
-    // pixel in your output image.
+    // Then, for each light in the scene, add it to a vector.
+    std::vector<Light *> lights;
+    lights.reserve(parser.getNumLights());
+    for (int i = 0; i < parser.getNumLights(); i++) {
+        lights.push_back(parser.getLight(i));
+    }
+    // Then loop over each pixel in the image, shooting a ray through that pixel .
+    // Write the color at the intersection to that pixel in your output image.
     for (int x = 0; x < camera->getWidth(); x++) {
         for (int y = 0; y < camera->getHeight(); y++) {
             Ray camRay = camera->generateRay(Vector2f(x, y));
-            Hit hit;
-            // 求交
-            bool intersect = group->intersect(camRay, hit, 0);
-            // 找到交点后，累加所有光源的光照影响
-            if (intersect) {
-                Vector3f finalColor = Vector3f::ZERO;
-                for (int i = 0; i < parser.getNumLights(); i++) {
-                    Light *light = parser.getLight(i);
-                    Vector3f L, lightColor;
-                    // 获得光照强度
-                    light->getIllumination(camRay.pointAtParameter(hit.getT()), L, lightColor);
-                    // 计算局部光强
-                    finalColor += hit.getMaterial()->Shade(camRay, hit, L, lightColor);
-                }
-                image.SetPixel(x, camera->getHeight() - y, finalColor);
-            } else {
-                // 无交点，置为背景色
-                image.SetPixel(x, camera->getHeight() - y, parser.getBackgroundColor());
-            };
+            // whitted-style ray tracing
+            Vector3f color = intersectColor_whitted_style(group, &camRay, lights, parser.getBackgroundColor(),
+                                                          false, 0);
+            image.SetPixel(x, camera->getHeight() - 1 - y, color);
+
         }
     }
 

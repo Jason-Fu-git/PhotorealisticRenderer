@@ -10,6 +10,8 @@
 #include "hit.hpp"
 #include "material.hpp"
 
+#define DISTURBANCE 0.01
+
 // Base class for all 3d entities.
 /**
  * @var material: Pointer to the material of the object.
@@ -26,6 +28,7 @@ public:
 
     // Intersect Ray with this object. If hit, store information in hit structure.
     virtual bool intersect(const Ray &r, Hit &h, float tmin) = 0;
+
 protected:
 
     Material *material;

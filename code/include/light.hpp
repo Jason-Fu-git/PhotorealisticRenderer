@@ -14,6 +14,12 @@ public:
 
     virtual ~Light() = default;
 
+    /**
+     * 获取某点的光照
+     * @param p 该点的坐标
+     * @param dir 将被修改：从该点到光源的方向向量
+     * @param col 将被修改：该点的光照颜色
+     */
     virtual void getIllumination(const Vector3f &p, Vector3f &dir, Vector3f &col) const = 0;
 };
 

@@ -4,8 +4,8 @@ PerspectiveCamera {
     direction 0 0 -1
     up 0 1 0
     angle 30
-    width 200
-    height 200
+    width 500
+    height 500
 }
 
 Lights {
@@ -22,13 +22,13 @@ Background {
 
 Materials {
     numMaterials 4
-    Material { diffuseColor 1 0 0 
+    Material { diffuseColor 1 0 0
       specularColor 1 1 1
       shininess 20
     }
     Material { diffuseColor 0 1 0 }
     Material { diffuseColor 0 0 1 }
-    Material { diffuseColor 1 1 1 
+    Material { diffuseColor 1 1 1
 	specularColor 1 1 1
 	shininess 20}
 }
@@ -42,21 +42,21 @@ Group {
     }
     MaterialIndex 1
     Sphere {
-	center 1 1 1 
+	center 1 1 3
         radius 0.75
     }
     Sphere {
-	center -1 -1 1 
+	center -0.5 -0.5 3
         radius 0.75
     }
     MaterialIndex 2
     Sphere {
-	center -1 1 -1 
+	center -1 1 -3
         radius 0.75
     }
     Sphere {
-	center 1 -1 -1 
-        radius 0.75 
+	center 1 -1 -10
+        radius 0.75
     }
     MaterialIndex 3
     Plane {

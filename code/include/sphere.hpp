@@ -35,7 +35,7 @@ public:
         float original_length = r.getDirection().length();
         // 利用几何法判断交点
         Vector3f l = _center - r.getOrigin();
-        float side = Vector3f::dot(l, l) > _radius * _radius; // side > 0 : outer ; side < 0 : inner
+        float side = Vector3f::dot(l, l) - _radius * _radius; // side > 0 : outer ; side < 0 : inner
         float tp = Vector3f::dot(l, r.getDirection().normalized());
         float t2 = _radius * _radius - (Vector3f::dot(l, l) - (tp * tp));
         float t = -1;
