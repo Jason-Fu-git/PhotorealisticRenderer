@@ -36,7 +36,9 @@ public:
         if (a != 0) {
             float t = -(-_d + Vector3f::dot(_normal, r.getOrigin())) / a / original_length;
             if (t > 0 && t > tmin && t < h.getT()) { // valid intersection
-                h.set(t, material, _normal);
+                // 判断入射方向
+                Vector3f normal = (Vector3f::dot(_normal, r.getDirection()) > 0) ? -_normal : _normal;
+                h.set(t, material, normal);
                 return true;
             }
         }

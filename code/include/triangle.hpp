@@ -48,7 +48,8 @@ public:
                 // 注：内外情况分类未处理
                 if (hit.getT() > t && t >= tmin) {
                     // 更新hit
-                    hit.set(t, material, normal.normalized());
+                    Vector3f _normal = (Vector3f::dot(normal, ray.getDirection()) > 0) ? -normal : normal;
+                    hit.set(t, material, _normal.normalized());
                     return true;
                 }
             }

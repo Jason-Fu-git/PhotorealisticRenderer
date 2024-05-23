@@ -19,39 +19,39 @@ class Material {
 public:
 
     explicit Material(const Vector3f &d_color, const Vector3f &s_color = Vector3f::ZERO, float s = 0) :
-            diffuseColor(d_color), specularColor(s_color), shininess(s), reflective_coefficient(0.2),
-            refractive_coefficient(0.5), refractive_index(0.9) {
+            diffuseColor(d_color), specularColor(s_color), shininess(s), reflective_coefficient(0.0),
+            refractive_coefficient(0.0), refractive_index(0.0) {
 
     }
 
     virtual ~Material() = default;
 
-    void setReflectiveProperties(float _reflective_coefficient) {
+    virtual void setReflectiveProperties(float _reflective_coefficient) {
         reflective_coefficient = _reflective_coefficient;
     }
 
-    void setRefractiveProperties(float _refractive_coefficient, float _refractive_index) {
+    virtual void setRefractiveProperties(float _refractive_coefficient, float _refractive_index) {
         refractive_coefficient = _refractive_coefficient;
         refractive_index = _refractive_index;
     }
 
-    bool isReflective() const {
+    virtual bool isReflective() const {
         return reflective_coefficient > 0.0;
     }
 
-    bool isRefractive() const {
+    virtual bool isRefractive() const {
         return refractive_coefficient > 0.0;
     }
 
-    float getReflectiveCoefficient() const {
+    virtual float getReflectiveCoefficient() const {
         return reflective_coefficient;
     }
 
-    float getRefractiveCoefficient() const {
+    virtual float getRefractiveCoefficient() const {
         return refractive_coefficient;
     }
 
-    float getRefractiveIndex() const {
+    virtual float getRefractiveIndex() const {
         return refractive_index;
     }
 
@@ -60,8 +60,8 @@ public:
      * Shade(...) computes the color of a ray when it hits a surface.
      * All the parameters need to be normalized! (except for colors)
      */
-    Vector3f Shade(const Ray &ray, const Hit &hit,
-                   const Vector3f &dirToLight, const Vector3f &lightColor) {
+    virtual Vector3f Shade(const Ray &ray, const Hit &hit,
+                           const Vector3f &dirToLight, const Vector3f &lightColor) {
         Vector3f R = (2 * Vector3f::dot(dirToLight, hit.getNormal()) * hit.getNormal() - dirToLight).normalized();
         Vector3f shaded = diffuseColor * std::max(Vector3f::dot(dirToLight, hit.getNormal()), 0.0f)
                           + specularColor * std::pow(std::max(-Vector3f::dot(R, ray.getDirection()), 0.0f), shininess);
@@ -76,6 +76,28 @@ protected:
     float refractive_index; // 折射率
     float refractive_coefficient; // 折射系数
     float reflective_coefficient; // 反射系数
+};
+
+/**
+ * 透明材料，漫反射系数和镜面反射系数为0，环境光项非0
+ * @author Jason Fu
+ *
+ */
+
+class TransparentMaterial : public Material {
+public:
+    explicit TransparentMaterial(float _refractive_index, float _refractive_coefficient,
+                                 float _reflective_coefficient) : Material(Vector3f::ZERO) {
+        refractive_coefficient = _refractive_coefficient;
+        refractive_index = _refractive_index;
+        reflective_coefficient = _reflective_coefficient;
+    }
+
+    // 透明物体，无Shade
+    Vector3f Shade(const Ray &ray, const Hit &hit,
+                           const Vector3f &dirToLight, const Vector3f &lightColor) override {
+        return Vector3f::ZERO;
+    }
 };
 
 

@@ -21,6 +21,8 @@
 #include "transform.hpp"
 
 #define DegreesToRadians(x) ((M_PI * x) / 180.0f)
+#define BASIC_MATERIAL 0
+#define TRANSPARENT_MATERIAL 1
 
 SceneParser::SceneParser(const char *filename) {
 
@@ -246,6 +248,10 @@ Material *SceneParser::parseMaterial() {
     filename[0] = 0;
     Vector3f diffuseColor(1, 1, 1), specularColor(0, 0, 0);
     float shininess = 0;
+    float rfl_c = 0;
+    float rfr_c = 0;
+    float rfr_i = 0;
+    int type = BASIC_MATERIAL;
     getToken(token);
     assert (!strcmp(token, "{"));
     while (true) {
@@ -259,10 +265,27 @@ Material *SceneParser::parseMaterial() {
         } else if (strcmp(token, "texture") == 0) {
             // Optional: read in texture and draw it.
             getToken(filename);
+        } else if (strcmp(token, "reflectiveCoefficient") == 0) {
+            rfl_c = readFloat();
+        } else if (strcmp(token, "refractiveIndex") == 0) {
+            rfr_i = readFloat();
+        } else if (strcmp(token, "refractiveCoefficient") == 0) {
+            rfr_c = readFloat();
+        } else if (strcmp(token, "type") == 0) {
+            type = readInt();
         } else {
             assert (!strcmp(token, "}"));
             break;
         }
+    }
+    if (type == 0) {
+        auto *answer = new Material(diffuseColor, specularColor, shininess);
+        answer->setReflectiveProperties(rfl_c);
+        answer->setRefractiveProperties(rfr_c, rfr_i);
+        return answer;
+    } else if (type == 1) {
+        auto *answer = new TransparentMaterial(rfr_i, rfr_c, rfl_c);
+        return answer;
     }
     auto *answer = new Material(diffuseColor, specularColor, shininess);
     return answer;

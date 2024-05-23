@@ -39,15 +39,17 @@ public:
         float tp = Vector3f::dot(l, r.getDirection().normalized());
         float t2 = _radius * _radius - (Vector3f::dot(l, l) - (tp * tp));
         float t = -1;
+        Vector3f normal = Vector3f::ZERO;
         if (side > 0 && tp >= 0 && t2 >= 0) { // 光源在球体外部，有交点
             t = (tp - sqrt(t2)) / original_length;
-        } else if (side < 0 && t2 >= 0) {
+            normal = (r.pointAtParameter(t) - _center).normalized();
+        } else if (side < 0 && t2 >= 0) { // 光源在球体内部，有交点
             t = (tp + sqrt(t2)) / original_length;
+            normal = - (r.pointAtParameter(t) - _center).normalized();
         } // 注：光源在球面上的情况未处理
         if (t > tmin && t < h.getT()) { // 是最近的点
             // 更新hit
-            Vector3f n = (t * r.getDirection().normalized() + r.getOrigin() - _center);
-            h.set(t, material, n.normalized());
+            h.set(t, material, normal);
             return true;
         }
         return false;

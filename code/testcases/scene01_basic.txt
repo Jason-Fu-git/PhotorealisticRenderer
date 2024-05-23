@@ -22,15 +22,32 @@ Background {
 
 Materials {
     numMaterials 4
-    Material { diffuseColor 1 0 0
+    Material {
+      type 0
+      reflectiveCoefficient 0.2
+      refractiveCoefficient 0.5
+      refractiveIndex 0.99
+      diffuseColor 1 0 0
       specularColor 1 1 1
       shininess 20
     }
-    Material { diffuseColor 0 1 0 }
-    Material { diffuseColor 0 0 1 }
-    Material { diffuseColor 1 1 1
-	specularColor 1 1 1
-	shininess 20}
+    Material {
+        type 0
+        reflectiveCoefficient 0.2
+        refractiveCoefficient 0.5
+        refractiveIndex 0.99
+        diffuseColor 0 1 0
+    }
+    Material {
+        type 0
+        diffuseColor 0 0 1
+    }
+    Material {
+        type 0
+        diffuseColor 1 1 1
+	    specularColor 1 1 1
+	    shininess 20
+	}
 }
 
 Group {

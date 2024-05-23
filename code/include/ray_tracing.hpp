@@ -14,7 +14,7 @@
 #include "light.hpp"
 #include "vector"
 
-#define MAX_DEPTH 5
+#define MIN_WEIGHT 0.001
 
 /**
  * 光线追踪的Whitted-style实现。
@@ -24,13 +24,13 @@
  * @param lights 光源
  * @param backgroundColor 背景颜色
  * @param is_inside 视线是否在物体内部
- * @param depth 递归深度
+ * @param weight 当前着色的权重
  * @return 多次反射/折射的累加，直至达到递归深度
  */
 Vector3f intersectColor_whitted_style(Group *group, Ray *ray, std::vector<Light *> &lights, Vector3f backgroundColor,
-                                      bool is_inside, int depth) {
-    if (depth > MAX_DEPTH)
-        return backgroundColor;
+                                      bool is_inside, float weight) {
+    if (weight < MIN_WEIGHT)
+        return Vector3f::ZERO;
 
     Hit hit;
     // 求交
@@ -53,23 +53,22 @@ Vector3f intersectColor_whitted_style(Group *group, Ray *ray, std::vector<Light 
             Ray *reflectionRay = reflect(*ray, hit.getNormal(), ray->pointAtParameter(hit.getT() - DISTURBANCE));
             finalColor += material->getReflectiveCoefficient() *
                           intersectColor_whitted_style(group, reflectionRay, lights, backgroundColor, is_inside,
-                                                       depth + 1);
+                                                       material->getReflectiveCoefficient() * weight);
         }
         // 递归计算折射光
         if (material->isRefractive()) {
             // 注意判断光线是否在物体内部
             float n1 = (is_inside) ? material->getRefractiveIndex() : 1;
             float n2 = (is_inside) ? 1 : material->getRefractiveIndex();
-            Vector3f normal = (is_inside) ? -hit.getNormal() : hit.getNormal();
             // 折射光
-            Ray *refractionRay = refract(*ray, normal, ray->pointAtParameter(hit.getT() + DISTURBANCE),
+            Ray *refractionRay = refract(*ray, hit.getNormal(), ray->pointAtParameter(hit.getT() + DISTURBANCE),
                                          n1, n2);
 
 
             if (refractionRay != nullptr) { // 若不发生全反射
                 finalColor += material->getRefractiveCoefficient() *
                               intersectColor_whitted_style(group, refractionRay, lights, backgroundColor, !is_inside,
-                                                           depth + 1);
+                                                           material->getRefractiveCoefficient() * weight);
             }
         }
         return finalColor;
