@@ -24,7 +24,7 @@ Materials {
     numMaterials 4
     Material {
       type 0
-      reflectiveCoefficient 0.2
+      reflectiveCoefficient 0.0
       refractiveCoefficient 0.5
       refractiveIndex 0.99
       diffuseColor 1 0 0
@@ -33,7 +33,7 @@ Materials {
     }
     Material {
         type 0
-        reflectiveCoefficient 0.2
+        reflectiveCoefficient 0.0
         refractiveCoefficient 0.5
         refractiveIndex 0.99
         diffuseColor 0 1 0

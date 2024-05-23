@@ -47,9 +47,15 @@ public:
             if (t > 0 && beta >= 0 && gamma >= 0 && beta + gamma <= 1) { // has intersection
                 // 注：内外情况分类未处理
                 if (hit.getT() > t && t >= tmin) {
+                    // 判断交点在物体内还是物体外
+                    Vector3f _normal = normal;
+                    bool isInside = false;
+                    if (Vector3f::dot(normal, ray.getDirection()) > 0) {
+                        _normal = -normal;
+                        isInside = true;
+                    }
                     // 更新hit
-                    Vector3f _normal = (Vector3f::dot(normal, ray.getDirection()) > 0) ? -normal : normal;
-                    hit.set(t, material, _normal.normalized());
+                    hit.set(t, material, _normal.normalized(), isInside);
                     return true;
                 }
             }

@@ -13,3 +13,4 @@ build/FinalProject testcases/scene04_axes.txt output/scene04.bmp
 build/FinalProject testcases/scene05_bunny_200.txt output/scene05.bmp
 build/FinalProject testcases/scene06_bunny_1k.txt output/scene06.bmp
 build/FinalProject testcases/scene07_shine.txt output/scene07.bmp
+build/FinalProject testcases/scene08_altered_smallpt.txt output/scene08.bmp

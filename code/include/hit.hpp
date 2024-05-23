@@ -23,18 +23,21 @@ public:
     Hit() {
         material = nullptr;
         t = 1e38;
+        is_inside = false;
     }
 
     Hit(float _t, Material *m, const Vector3f &n) {
         t = _t;
         material = m;
         normal = n;
+        is_inside = false;
     }
 
     Hit(const Hit &h) {
         t = h.t;
         material = h.material;
         normal = h.normal;
+        is_inside = h.is_inside;
     }
 
     // destructor
@@ -52,14 +55,20 @@ public:
         return normal;
     }
 
-    void set(float _t, Material *m, const Vector3f &n) {
+    bool isInside() const {
+        return is_inside;
+    }
+
+    void set(float _t, Material *m, const Vector3f &n, bool _is_inside) {
         t = _t;
         material = m;
         normal = n;
+        is_inside = _is_inside;
     }
 
 private:
     float t;
+    bool is_inside;
     Material *material;
     Vector3f normal;
 

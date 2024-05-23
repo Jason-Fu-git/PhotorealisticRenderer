@@ -46,8 +46,7 @@ int main(int argc, char *argv[]) {
         for (int y = 0; y < camera->getHeight(); y++) {
             Ray camRay = camera->generateRay(Vector2f(x, y));
             // whitted-style ray tracing
-            Vector3f color = intersectColor_whitted_style(group, &camRay, lights, parser.getBackgroundColor(),
-                                                          false, 1);
+            Vector3f color = intersectColor_whitted_style(group, &camRay, lights, parser.getBackgroundColor(), 1, 3);
             image.SetPixel(x, camera->getHeight() - 1 - y, color);
 
         }

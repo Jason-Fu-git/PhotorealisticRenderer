@@ -23,13 +23,13 @@
  * @param ray 射线
  * @param lights 光源
  * @param backgroundColor 背景颜色
- * @param is_inside 视线是否在物体内部
  * @param weight 当前着色的权重
+ * @param depth 剩余递归深度
  * @return 多次反射/折射的累加，直至达到递归深度
  */
 Vector3f intersectColor_whitted_style(Group *group, Ray *ray, std::vector<Light *> &lights, Vector3f backgroundColor,
-                                      bool is_inside, float weight) {
-    if (weight < MIN_WEIGHT)
+                                      float weight, int depth) {
+    if (weight < MIN_WEIGHT && depth > 0)
         return Vector3f::ZERO;
 
     Hit hit;
@@ -40,20 +40,21 @@ Vector3f intersectColor_whitted_style(Group *group, Ray *ray, std::vector<Light 
         // 累加所有光源的影响
         Vector3f finalColor = Vector3f::ZERO;
         Material *material = hit.getMaterial();
+        bool is_inside = hit.isInside();
         for (auto light: lights) {
             Vector3f L, lightColor;
             // 获得光照强度
             light->getIllumination(ray->pointAtParameter(hit.getT()), L, lightColor);
-            // 计算局部光强
-            if (!is_inside)
+            // 计算局部光强（如果不是在物体内部，且不是在阴影中）
+            if (!light->isInShadow(ray->pointAtParameter(hit.getT()), group))
                 finalColor += material->Shade(*ray, hit, L, lightColor);
         }
         // 递归计算反射光
         if (material->isReflective()) {
             Ray *reflectionRay = reflect(*ray, hit.getNormal(), ray->pointAtParameter(hit.getT() - DISTURBANCE));
             finalColor += material->getReflectiveCoefficient() *
-                          intersectColor_whitted_style(group, reflectionRay, lights, backgroundColor, is_inside,
-                                                       material->getReflectiveCoefficient() * weight);
+                    intersectColor_whitted_style(group, reflectionRay, lights, backgroundColor,
+                                                 material->getReflectiveCoefficient() * weight, depth - 1);
         }
         // 递归计算折射光
         if (material->isRefractive()) {
@@ -67,8 +68,8 @@ Vector3f intersectColor_whitted_style(Group *group, Ray *ray, std::vector<Light 
 
             if (refractionRay != nullptr) { // 若不发生全反射
                 finalColor += material->getRefractiveCoefficient() *
-                              intersectColor_whitted_style(group, refractionRay, lights, backgroundColor, !is_inside,
-                                                           material->getRefractiveCoefficient() * weight);
+                        intersectColor_whitted_style(group, refractionRay, lights, backgroundColor,
+                                                     material->getRefractiveCoefficient() * weight, depth - 1);
             }
         }
         return finalColor;

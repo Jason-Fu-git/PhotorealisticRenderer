@@ -40,16 +40,19 @@ public:
         float t2 = _radius * _radius - (Vector3f::dot(l, l) - (tp * tp));
         float t = -1;
         Vector3f normal = Vector3f::ZERO;
+        bool is_inside = false;
         if (side > 0 && tp >= 0 && t2 >= 0) { // 光源在球体外部，有交点
             t = (tp - sqrt(t2)) / original_length;
             normal = (r.pointAtParameter(t) - _center).normalized();
+            is_inside = false;
         } else if (side < 0 && t2 >= 0) { // 光源在球体内部，有交点
             t = (tp + sqrt(t2)) / original_length;
             normal = - (r.pointAtParameter(t) - _center).normalized();
-        } // 注：光源在球面上的情况未处理
+            is_inside = true;
+        } // 注：光源在球面上的情况未处理，需要加微小扰动
         if (t > tmin && t < h.getT()) { // 是最近的点
             // 更新hit
-            h.set(t, material, normal);
+            h.set(t, material, normal, is_inside);
             return true;
         }
         return false;
