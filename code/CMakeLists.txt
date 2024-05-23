@@ -1,11 +1,14 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 PROJECT(FinalProject CXX)
 
-IF(NOT CMAKE_BUILD_TYPE)
+IF (NOT CMAKE_BUILD_TYPE)
     SET(CMAKE_BUILD_TYPE Release)
-ENDIF()
+ENDIF ()
 
 ADD_SUBDIRECTORY(deps/vecmath)
+
+# Add compiler options
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fopenmp")
 
 SET(FINAL_PROJECT_SOURCES
         src/image.cpp
@@ -29,6 +32,7 @@ SET(FINAL_PROJECT_INCLUDES
         include/transform.hpp
         include/triangle.hpp
         include/ray_tracing.hpp
+        include/utils_random.hpp
 )
 
 SET(CMAKE_CXX_STANDARD 11)

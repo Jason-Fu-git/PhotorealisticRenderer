@@ -29,7 +29,7 @@
  */
 Vector3f intersectColor_whitted_style(Group *group, Ray *ray, std::vector<Light *> &lights, Vector3f backgroundColor,
                                       float weight, int depth) {
-    if (weight < MIN_WEIGHT && depth > 0)
+    if (weight < MIN_WEIGHT || depth == 0)
         return Vector3f::ZERO;
 
     Hit hit;
@@ -55,6 +55,7 @@ Vector3f intersectColor_whitted_style(Group *group, Ray *ray, std::vector<Light 
             finalColor += material->getReflectiveCoefficient() *
                     intersectColor_whitted_style(group, reflectionRay, lights, backgroundColor,
                                                  material->getReflectiveCoefficient() * weight, depth - 1);
+            delete reflectionRay;
         }
         // 递归计算折射光
         if (material->isRefractive()) {
@@ -71,6 +72,8 @@ Vector3f intersectColor_whitted_style(Group *group, Ray *ray, std::vector<Light 
                         intersectColor_whitted_style(group, refractionRay, lights, backgroundColor,
                                                      material->getRefractiveCoefficient() * weight, depth - 1);
             }
+
+            delete refractionRay;
         }
         return finalColor;
     } else {

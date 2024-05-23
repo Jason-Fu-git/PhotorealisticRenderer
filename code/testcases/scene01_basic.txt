@@ -26,7 +26,7 @@ Materials {
       type 0
       reflectiveCoefficient 0.0
       refractiveCoefficient 0.5
-      refractiveIndex 0.99
+      refractiveIndex 1.5
       diffuseColor 1 0 0
       specularColor 1 1 1
       shininess 20
@@ -35,7 +35,7 @@ Materials {
         type 0
         reflectiveCoefficient 0.0
         refractiveCoefficient 0.5
-        refractiveIndex 0.99
+        refractiveIndex 1.5
         diffuseColor 0 1 0
     }
     Material {

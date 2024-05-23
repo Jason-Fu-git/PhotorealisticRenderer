@@ -3,8 +3,8 @@ PerspectiveCamera {
     direction 0 -0.042612 -1
     up 0 1 0
     angle 30
-    width 600
-    height 600
+    width 720
+    height 720
 }
 
 Lights {
@@ -55,7 +55,7 @@ Materials {
         type 0
         diffuseColor 0 0.9 0
         refractiveCoefficient 0.5
-        refractiveIndex 0.99
+        refractiveIndex 1.5
         reflectiveCoefficient 0.0
     }
     Material {
