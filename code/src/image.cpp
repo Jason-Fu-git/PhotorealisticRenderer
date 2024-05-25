@@ -8,6 +8,7 @@
 #include <cstring>
 
 #include "image.hpp"
+#include "utils.hpp"
 
 // some helper functions for save & load
 
@@ -27,7 +28,7 @@ void WriteByte( FILE* file, unsigned char b )
 
 unsigned char ClampColorComponent( float c )
 {
-    int tmp = int( c * 255 );
+    int tmp = toRGB(c, 2.2);
     
     if( tmp < 0 )
     {

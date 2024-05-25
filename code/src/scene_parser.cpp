@@ -22,7 +22,7 @@
 
 #define DegreesToRadians(x) ((M_PI * x) / 180.0f)
 #define BASIC_MATERIAL 0
-#define TRANSPARENT_MATERIAL 1
+#define BRDF_MATERIAL 1
 
 SceneParser::SceneParser(const char *filename) {
 
@@ -37,6 +37,7 @@ SceneParser::SceneParser(const char *filename) {
     current_material = nullptr;
 
     // parse the file
+    printf("parsing scene file %s\n", filename);
     assert(filename != nullptr);
     const char *ext = &filename[strlen(filename) - 4];
 
@@ -246,12 +247,13 @@ Material *SceneParser::parseMaterial() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     char filename[MAX_PARSER_TOKEN_LENGTH];
     filename[0] = 0;
-    Vector3f diffuseColor(1, 1, 1), specularColor(0, 0, 0);
+    Vector3f diffuseColor(1, 1, 1), specularColor(0, 0, 0), emissionColor(0, 0, 0);
     float shininess = 0;
     float rfl_c = 0;
     float rfr_c = 0;
     float rfr_i = 0;
-    int type = BASIC_MATERIAL;
+    int materialType = BASIC_MATERIAL;
+    int surfaceType = Material::DIFFUSE;
     getToken(token);
     assert (!strcmp(token, "{"));
     while (true) {
@@ -260,6 +262,8 @@ Material *SceneParser::parseMaterial() {
             diffuseColor = readVector3f();
         } else if (strcmp(token, "specularColor") == 0) {
             specularColor = readVector3f();
+        } else if (strcmp(token, "emissionColor") == 0) {
+            emissionColor = readVector3f();
         } else if (strcmp(token, "shininess") == 0) {
             shininess = readFloat();
         } else if (strcmp(token, "texture") == 0) {
@@ -271,24 +275,29 @@ Material *SceneParser::parseMaterial() {
             rfr_i = readFloat();
         } else if (strcmp(token, "refractiveCoefficient") == 0) {
             rfr_c = readFloat();
-        } else if (strcmp(token, "type") == 0) {
-            type = readInt();
+        } else if (strcmp(token, "materialType") == 0) {
+            materialType = readInt();
+        } else if (strcmp(token, "surfaceType") == 0) {
+            surfaceType = readInt();
         } else {
             assert (!strcmp(token, "}"));
             break;
         }
     }
-    if (type == 0) {
-        auto *answer = new Material(diffuseColor, specularColor, shininess);
+    assert(surfaceType == Material::DIFFUSE || surfaceType == Material::SPECULAR ||
+           surfaceType == Material::TRANSPARENT);
+    if (materialType == BASIC_MATERIAL) {
+        auto *answer = new PhongMaterial(diffuseColor, specularColor, shininess);
         answer->setReflectiveProperties(rfl_c);
         answer->setRefractiveProperties(rfr_c, rfr_i);
         return answer;
-    } else if (type == 1) {
-        auto *answer = new TransparentMaterial(rfr_i, rfr_c, rfl_c);
+    } else if (materialType == BRDF_MATERIAL) {
+        auto *answer = new BRDFMaterial(diffuseColor, rfr_c, rfl_c, rfr_i, surfaceType, emissionColor);
         return answer;
+    }else{
+        printf("Unknown material type in parseObject: '%d'\n", materialType);
+        exit(0);
     }
-    auto *answer = new Material(diffuseColor, specularColor, shininess);
-    return answer;
 }
 
 // ====================================================================
