@@ -174,6 +174,8 @@ void SceneParser::parseLights() {
             lights[count] = parseDirectionalLight();
         } else if (strcmp(token, "PointLight") == 0) {
             lights[count] = parsePointLight();
+        } else if (strcmp(token, "SphereLight") == 0) {
+            lights[count] = parseSphereLight();
         } else {
             printf("Unknown token in parseLight: '%s'\n", token);
             exit(0);
@@ -212,6 +214,24 @@ Light *SceneParser::parsePointLight() {
     getToken(token);
     assert (!strcmp(token, "}"));
     return new PointLight(position, color);
+}
+
+Light *SceneParser::parseSphereLight() {
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    getToken(token);
+    assert (!strcmp(token, "{"));
+    getToken(token);
+    assert (!strcmp(token, "position"));
+    Vector3f position = readVector3f();
+    getToken(token);
+    assert (!strcmp(token, "color"));
+    Vector3f color = readVector3f();
+    getToken(token);
+    assert (!strcmp(token, "radius"));
+    float radius = readFloat();
+    getToken(token);
+    assert (!strcmp(token, "}"));
+    return new SphereLight(position, radius, color);
 }
 // ====================================================================
 // ====================================================================
@@ -294,7 +314,7 @@ Material *SceneParser::parseMaterial() {
     } else if (materialType == BRDF_MATERIAL) {
         auto *answer = new BRDFMaterial(diffuseColor, rfr_c, rfl_c, rfr_i, surfaceType, emissionColor);
         return answer;
-    }else{
+    } else {
         printf("Unknown material type in parseObject: '%d'\n", materialType);
         exit(0);
     }

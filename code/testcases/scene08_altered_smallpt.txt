@@ -30,36 +30,29 @@ Background {
 Materials {
     numMaterials 7
     Material {
-        type 0
         diffuseColor 0.75 0.25 0.25
     }
     Material {
-        type 0
         diffuseColor 0.25 0.25 0.75
     }
     Material {
-        type 0
         diffuseColor 0.75 0.75 0.75
     }
     Material {
-        type 0
         diffuseColor 0 0 0
     }
     Material {
-        type 0
         diffuseColor 0.7 0 0
         refractiveCoefficient 0.0
         reflectiveCoefficient 0.5
     }
     Material {
-        type 0
         diffuseColor 0 0.9 0
         refractiveCoefficient 0.5
         refractiveIndex 1.5
         reflectiveCoefficient 0.0
     }
     Material {
-        type 0
         diffuseColor 0 0 0
         shininess 30
     }

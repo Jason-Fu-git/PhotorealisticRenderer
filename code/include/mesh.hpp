@@ -18,6 +18,8 @@ class Mesh : public Object3D {
 public:
     Mesh(const char *filename, Material *m);
 
+    ~Mesh() override = default;
+
     struct TriangleIndex {
         TriangleIndex() {
             x[0] = 0; x[1] = 0; x[2] = 0;

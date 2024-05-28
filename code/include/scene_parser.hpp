@@ -94,6 +94,8 @@ private:
     Material **materials;
     Material *current_material;
     Group *group;
+
+    Light *parseSphereLight();
 };
 
 #endif // SCENE_PARSER_H

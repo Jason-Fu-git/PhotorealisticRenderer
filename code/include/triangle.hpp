@@ -24,6 +24,8 @@ class Triangle : public Object3D {
 public:
     Triangle() = delete;
 
+    ~Triangle() override = default;
+
     // a b c are three vertex positions of the triangle
     Triangle(const Vector3f &a, const Vector3f &b, const Vector3f &c, Material *m) : Object3D(m) {
         _a = a;

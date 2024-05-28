@@ -44,6 +44,10 @@ public:
         objects.insert(objects.begin() + index, obj);
     }
 
+    Object3D* getObject(int index) {
+        return objects[index];
+    }
+
     int getGroupSize() {
         return objects.size();
     }

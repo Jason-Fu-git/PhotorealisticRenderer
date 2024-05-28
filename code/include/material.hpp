@@ -40,6 +40,10 @@ public:
         refractive_index = _refractive_index;
     }
 
+    virtual bool isEmitter() const {
+        return false;
+    }
+
     virtual bool isReflective() const {
         return reflective_coefficient > 0.0;
     }
@@ -134,6 +138,12 @@ public:
                           const Vector3f &e_color = Vector3f::ZERO)
             : Material(d_color, rfr_c, rfl_c, rfr_i), emissionColor(e_color) {
         type = _type;
+    }
+
+    ~BRDFMaterial() override = default;
+
+    bool isEmitter() const override {
+        return emissionColor.x() > 0 || emissionColor.y() > 0 || emissionColor.z() > 0;
     }
 
     Vector3f getEmissionColor() const override {

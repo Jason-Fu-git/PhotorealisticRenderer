@@ -31,7 +31,7 @@ SET(FINAL_PROJECT_INCLUDES
         include/sphere.hpp
         include/transform.hpp
         include/triangle.hpp
-        include/ray_tracing.hpp
+        include/render.hpp
         include/utils.hpp
 )
 
