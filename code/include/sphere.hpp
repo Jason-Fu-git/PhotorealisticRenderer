@@ -2,10 +2,10 @@
 #define SPHERE_H
 
 #include "object3d.hpp"
+#include <utility>
 #include <vecmath.h>
 #include <cmath>
 
-// DONE: Implement functions and add more fields as necessary
 
 /**
  * @copybrief 项目所有者独立实现
@@ -47,7 +47,7 @@ public:
             is_inside = false;
         } else if (side < 0 && t2 >= 0) { // 光源在球体内部，有交点
             t = (tp + sqrt(t2)) / original_length;
-            normal = - (r.pointAtParameter(t) - _center).normalized();
+            normal = -(r.pointAtParameter(t) - _center).normalized();
             is_inside = true;
         } // 注：光源在球面上的情况未处理，需要加微小扰动
         if (t > tmin && t < h.getT()) { // 是最近的点
@@ -56,6 +56,18 @@ public:
             return true;
         }
         return false;
+    }
+
+    std::pair<int, int>
+    textureMap(float objectX, float objectY, float objectZ, int textureWidth, int textureHeight) override {
+        float x = objectX - _center.x();
+        float y = objectY - _center.y();
+        float z = objectZ - _center.z();
+        float theta = std::atan2(z, x); // xOz平面
+        float phi = std::acos(y / _radius); // y轴方向
+        float u = (M_PI + theta) / (2 * M_PI);
+        float v = (M_PI - phi) / M_PI;
+        return std::make_pair((int) (u * textureWidth), (int) (v * textureHeight));
     }
 
 protected:

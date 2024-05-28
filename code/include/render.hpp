@@ -48,7 +48,7 @@ public:
         }
         // Then loop over each pixel in the image, shooting a ray through that pixel .
         // Write the color at the intersection to that pixel in your output image.
-#pragma omp parallel for schedule(dynamic, 1)
+//#pragma omp parallel for schedule(dynamic, 1)
         for (int y = 0; y < camera->getHeight(); y++) {
             if (printProgress)
                 fprintf(stderr, "\rRendering (%d spp) %5.2f%%", samples * 4, 100. * y / (camera->getHeight() - 1));
@@ -199,7 +199,7 @@ public:
         if (!intersect) return backgroundColor; // 未相交则返回背景色
         Material *material = hit.getMaterial();
         int type = material->getType();
-        Vector3f color = material->getDiffuseColor();
+        Vector3f color = material->Shade(ray, hit, Vector3f::ZERO, Vector3f::ZERO);
         Vector3f e_color = material->getEmissionColor();
         Vector3f final_color = Vector3f::ZERO;
         float p = std::max(color.x(), std::max(color.y(), color.z())) / 1.25;
@@ -219,8 +219,8 @@ public:
             float r2 = uniform01(), r2s = std::sqrt(r2);
             // 生成正交坐标系 (w, u, v)
             Vector3f w = hit.getNormal();
-            Vector3f u = ((std::fabs(w.x()) > 0.1 ? Vector3f(0, 1, 0) : Vector3f::cross(Vector3f(1, 0, 0),
-                                                                                        w))).normalized();
+            Vector3f u = (Vector3f::cross((std::fabs(w.x()) > 0.1 ? Vector3f(0, 1, 0) : Vector3f(1, 0, 0)),
+                                          w)).normalized();
             Vector3f v = Vector3f::cross(w, u).normalized();
             // 生成漫反射曲线
             Vector3f dir = (u * std::cos(r1) * r2s + v * std::sin(r1) * r2s + w * std::sqrt(1 - r2)).normalized();

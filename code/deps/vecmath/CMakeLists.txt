@@ -22,7 +22,8 @@ SET(VECMATH_SOURCES
         src/Quat4f.cpp
         src/Vector2f.cpp
         src/Vector3f.cpp
-        src/Vector4f.cpp)
+        src/Vector4f.cpp
+)
 
 SET(CMAKE_CXX_STANDARD 11)
 

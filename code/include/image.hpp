@@ -33,6 +33,9 @@ public:
     }
 
     const Vector3f &GetPixel(int x, int y) const {
+        if(x < 0 || x >= width || y < 0 || y >= height){
+            printf("Warning: pixel (%d, %d) out of bounds (%d, %d)\n", x, y, width, height);
+        }
         assert(x >= 0 && x < width);
         assert(y >= 0 && y < height);
         return data[y * width + x];

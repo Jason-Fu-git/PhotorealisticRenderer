@@ -14,7 +14,9 @@ SET(FINAL_PROJECT_SOURCES
         src/image.cpp
         src/main.cpp
         src/mesh.cpp
-        src/scene_parser.cpp)
+        src/scene_parser.cpp
+        src/material.cpp
+)
 
 SET(FINAL_PROJECT_INCLUDES
         include/camera.hpp

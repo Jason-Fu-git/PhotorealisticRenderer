@@ -250,7 +250,8 @@ void SceneParser::parseMaterials() {
     while (num_materials > count) {
         getToken(token);
         if (!strcmp(token, "Material") ||
-            !strcmp(token, "PhongMaterial")) {
+            !strcmp(token, "PhongMaterial") ||
+            !strcmp(token, "BRDFMaterial")) {
             materials[count] = parseMaterial();
         } else {
             printf("Unknown token in parseMaterial: '%s'\n", token);
@@ -287,7 +288,6 @@ Material *SceneParser::parseMaterial() {
         } else if (strcmp(token, "shininess") == 0) {
             shininess = readFloat();
         } else if (strcmp(token, "texture") == 0) {
-            // Optional: read in texture and draw it.
             getToken(filename);
         } else if (strcmp(token, "reflectiveCoefficient") == 0) {
             rfl_c = readFloat();
@@ -310,9 +310,13 @@ Material *SceneParser::parseMaterial() {
         auto *answer = new PhongMaterial(diffuseColor, specularColor, shininess);
         answer->setReflectiveProperties(rfl_c);
         answer->setRefractiveProperties(rfr_c, rfr_i);
+        if (filename[0])
+            answer->setTexture(filename);
         return answer;
     } else if (materialType == BRDF_MATERIAL) {
         auto *answer = new BRDFMaterial(diffuseColor, rfr_c, rfl_c, rfr_i, surfaceType, emissionColor);
+        if (filename[0])
+            answer->setTexture(filename);
         return answer;
     } else {
         printf("Unknown material type in parseObject: '%d'\n", materialType);
@@ -376,11 +380,19 @@ Group *SceneParser::parseGroup() {
             int index = readInt();
             assert (index >= 0 && index <= getNumMaterials());
             current_material = getMaterial(index);
+            if (auto phong_m = dynamic_cast<PhongMaterial *>(current_material)) {
+                current_material = new PhongMaterial(*phong_m);
+            } else if (auto brdf_m = dynamic_cast<BRDFMaterial *>(current_material)) {
+                current_material = new BRDFMaterial(*brdf_m);
+            } else {
+                printf("Unknown material type in parseObject: '%d'\n", index);
+                exit(-1);
+            }
         } else {
             Object3D *object = parseObject(token);
             assert (object != nullptr);
             answer->addObject(count, object);
-
+            current_material->setObject(object);
             count++;
         }
     }

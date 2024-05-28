@@ -4,10 +4,14 @@
 #include <cassert>
 #include <vecmath.h>
 #include <cmath>
+#include <cstring>
+#include <iostream>
 
 #include "ray.hpp"
 #include "hit.hpp"
-#include <iostream>
+#include "image.hpp"
+
+class Object3D;
 
 /**
  * @copybrief 项目所有者独立实现
@@ -25,11 +29,22 @@ public:
 
     explicit Material(const Vector3f &d_color, float rfr_c, float rfl_c, float rfr_i) :
             diffuseColor(d_color), reflective_coefficient(rfl_c),
-            refractive_coefficient(rfr_c), refractive_index(rfr_i), type(DIFFUSE) {
+            refractive_coefficient(rfr_c), refractive_index(rfr_i), type(DIFFUSE), object(nullptr), texture(nullptr) {
 
     }
 
+    Material(const Material &m) {
+        diffuseColor = m.diffuseColor;
+        reflective_coefficient = m.reflective_coefficient;
+        refractive_coefficient = m.refractive_coefficient;
+        refractive_index = m.refractive_index;
+        type = m.type;
+        object = m.object;
+        texture = m.texture;
+    }
+
     virtual ~Material() = default;
+
 
     virtual void setReflectiveProperties(float _reflective_coefficient) {
         reflective_coefficient = _reflective_coefficient;
@@ -39,6 +54,12 @@ public:
         refractive_coefficient = _refractive_coefficient;
         refractive_index = _refractive_index;
     }
+
+    virtual void setObject(Object3D *object3D) {
+        object = object3D;
+    }
+
+    void setTexture(const char *filename) ;
 
     virtual bool isEmitter() const {
         return false;
@@ -72,6 +93,10 @@ public:
         return Vector3f::ZERO;
     }
 
+    virtual Object3D *getObject() const {
+        return object;
+    }
+
     virtual int getType() const {
         return type;
     }
@@ -89,10 +114,12 @@ public:
 
 protected:
     Vector3f diffuseColor;
-    float refractive_index; // 折射率
-    float refractive_coefficient; // 折射系数
-    float reflective_coefficient; // 反射系数
-    int type; // 材料类型
+    Object3D *object{}; // the object that this material belongs to
+    Image *texture{};
+    float refractive_index{}; // 折射率
+    float refractive_coefficient{}; // 折射系数
+    float reflective_coefficient{}; // 反射系数
+    int type{}; // 材料类型
 };
 
 /**
@@ -107,6 +134,11 @@ public:
 
     }
 
+    PhongMaterial(const PhongMaterial& m) : Material(m){
+        specularColor = m.specularColor;
+        shininess = m.shininess;
+    }
+
     ~PhongMaterial() override = default;
 
 
@@ -115,13 +147,7 @@ public:
      * All the parameters need to be normalized! (except for colors)
      */
     Vector3f Shade(const Ray &ray, const Hit &hit,
-                   const Vector3f &dirToLight, const Vector3f &lightColor) override {
-        Vector3f R = (2 * Vector3f::dot(dirToLight, hit.getNormal()) * hit.getNormal() - dirToLight).normalized();
-        Vector3f shaded = diffuseColor * std::max(Vector3f::dot(dirToLight, hit.getNormal()), 0.0f)
-                          + specularColor * std::pow(std::max(-Vector3f::dot(R, ray.getDirection()), 0.0f), shininess);
-        shaded = lightColor * shaded;
-        return shaded;
-    }
+                   const Vector3f &dirToLight, const Vector3f &lightColor) override;
 
 protected:
     Vector3f specularColor;
@@ -140,6 +166,10 @@ public:
         type = _type;
     }
 
+    BRDFMaterial(const BRDFMaterial& m) : Material(m){
+        emissionColor = m.emissionColor;
+    }
+
     ~BRDFMaterial() override = default;
 
     bool isEmitter() const override {
@@ -150,11 +180,8 @@ public:
         return emissionColor;
     }
 
-    // BRDF的shade由蒙特卡洛方法决定，这个函数没用。
     Vector3f Shade(const Ray &ray, const Hit &hit,
-                   const Vector3f &dirToLight, const Vector3f &color) override {
-        return color;
-    }
+                   const Vector3f &dirToLight, const Vector3f &color) override;
 
 protected:
     Vector3f emissionColor;

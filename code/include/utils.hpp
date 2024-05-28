@@ -2,6 +2,7 @@
 #define UTILS_RANDOM_HPP
 
 #include "random"
+#include "vecmath.h"
 
 /**
  * Seeds the random number generator.
@@ -52,5 +53,28 @@ inline int toRGB(double x, double gamma = 2.2) {
     return int(std::pow(clamp(x, 0, 1), 1 / gamma) * 255 + 0.5);
 }
 
+/**
+ * check if the string ends with the ending string
+ * @param fullString
+ * @param ending
+ * @return true if fullString ends with ending, false otherwise
+ */
+inline bool hasEnding (std::string const &fullString, std::string const &ending) {
+    if (fullString.length() >= ending.length()) {
+        return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
+    } else {
+        return false;
+    }
+}
+
+/**
+ * calculate x % y
+ * @param x
+ * @param y
+ * @return [0, y]
+ */
+inline double mod(double x, double y) {
+    return fmod(fmod(x, y) + y, y);
+}
 
 #endif // UTILS_RANDOM_HPP
