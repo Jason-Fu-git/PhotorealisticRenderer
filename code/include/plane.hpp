@@ -2,6 +2,7 @@
 #define PLANE_H
 
 #include "object3d.hpp"
+#include "utils.hpp"
 #include <vecmath.h>
 #include <cmath>
 

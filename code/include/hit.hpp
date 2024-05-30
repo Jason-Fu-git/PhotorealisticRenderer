@@ -66,6 +66,10 @@ public:
         is_inside = _is_inside;
     }
 
+    inline void reset(){
+        t = 1e38;
+    }
+
 private:
     float t;
     bool is_inside;

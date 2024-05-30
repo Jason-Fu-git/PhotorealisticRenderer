@@ -4,6 +4,7 @@
  */
 
 #include "mesh.hpp"
+#include <cfloat>
 #include <fstream>
 #include <iostream>
 #include <algorithm>
@@ -13,11 +14,14 @@
 
 
 bool Mesh::intersect(const Ray &r, Hit &h, float tmin) {
-
+    // First intersect with the Bounding Box
+    if (!bbox->isIntersect(r)){
+        return false;
+    }
     // Optional: Change this brute force method into a faster one.
     bool result = false;
     for (int triId = 0; triId < (int) t.size(); ++triId) {
-        TriangleIndex& triIndex = t[triId];
+        TriangleIndex &triIndex = t[triId];
         Triangle triangle(v[triIndex[0]],
                           v[triIndex[1]], v[triIndex[2]], material);
         triangle.normal = n[triId];
@@ -29,6 +33,7 @@ bool Mesh::intersect(const Ray &r, Hit &h, float tmin) {
 Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
 
     // Optional: Use tiny obj loader to replace this simple one.
+    float x0 = FLT_MAX, x1 = -FLT_MAX, y0 = FLT_MAX, y1 = -FLT_MAX, z0 = FLT_MAX, z1 = -FLT_MAX;
     std::ifstream f;
     f.open(filename);
     if (!f.is_open()) {
@@ -58,6 +63,12 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
         if (tok == vTok) {
             Vector3f vec;
             ss >> vec[0] >> vec[1] >> vec[2];
+            x0 = std::min(x0, vec[0]);
+            x1 = std::max(x1, vec[0]);
+            y0 = std::min(y0, vec[1]);
+            y1 = std::max(y1, vec[1]);
+            z0 = std::min(z0, vec[2]);
+            z1 = std::max(z1, vec[2]);
             v.push_back(vec);
         } else if (tok == fTok) {
             if (line.find(bslash) != std::string::npos) {
@@ -84,34 +95,30 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
             ss >> texcoord[1];
         }
     }
-    computeNormal();
-    constructTriangles();
-    constructBSPTree();
-    f.close();
-    printf("Mesh %s loaded\n", filename);
-}
-
-void Mesh::computeNormal() {
+    // compute normal
     n.resize(t.size());
     for (int triId = 0; triId < (int) t.size(); ++triId) {
-        TriangleIndex& triIndex = t[triId];
+        TriangleIndex &triIndex = t[triId];
         Vector3f a = v[triIndex[1]] - v[triIndex[0]];
         Vector3f b = v[triIndex[2]] - v[triIndex[0]];
         b = Vector3f::cross(a, b);
         n[triId] = b / b.length();
     }
-}
-
-void Mesh::constructTriangles() {
+    // construct the triangles
     for (int triId = 0; triId < (int) t.size(); ++triId) {
-        TriangleIndex& triIndex = t[triId];
+        TriangleIndex &triIndex = t[triId];
         auto triangle = new Triangle(v[triIndex[0]],
-                          v[triIndex[1]], v[triIndex[2]], material);
+                                     v[triIndex[1]], v[triIndex[2]], material);
         triangle->normal = n[triId];
         triangles.push_back(triangle);
     }
+    // construct the bounding box
+    bbox = new BoundingBox(x0 - 0.01, x1 + 0.01,
+                           y0 - 0.01, y1 + 0.01,
+                           z0 - 0.01, z1 + 0.01);
+    // construct other fields
+    bspTree = new BSPTree(triangles);
+    f.close();
+    printf("Mesh %s loaded\n", filename);
 }
 
-void Mesh::constructBSPTree() {
-    bspTree = new BSPTree(triangles);
-}

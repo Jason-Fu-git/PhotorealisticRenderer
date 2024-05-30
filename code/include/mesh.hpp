@@ -9,6 +9,7 @@
 #include <vector>
 #include "object3d.hpp"
 #include "triangle.hpp"
+#include "boundingBox.hpp"
 #include "BSPTree.hpp"
 #include "Vector2f.h"
 #include "Vector3f.h"
@@ -25,6 +26,7 @@ public:
         }
         triangles.clear();
         delete bspTree;
+        delete bbox;
     }
 
     struct TriangleIndex {
@@ -49,16 +51,9 @@ public:
 
 private:
 
-    // Normal can be used for light estimation
-    void computeNormal();
-
-    // construct triangles
-    void constructTriangles();
-
-    // construct BSP tree
-    void constructBSPTree();
 
     BSPTree *bspTree;
+    BoundingBox *bbox;
 };
 
 #endif

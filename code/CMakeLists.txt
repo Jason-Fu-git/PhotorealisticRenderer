@@ -37,6 +37,7 @@ SET(FINAL_PROJECT_INCLUDES
         include/render.hpp
         include/utils.hpp
         include/BSPTree.hpp
+        include/boundingBox.hpp
 )
 
 SET(CMAKE_CXX_STANDARD 11)
