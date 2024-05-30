@@ -11,6 +11,7 @@
 #include <utility>
 #include <sstream>
 
+
 bool Mesh::intersect(const Ray &r, Hit &h, float tmin) {
 
     // Optional: Change this brute force method into a faster one.
@@ -84,8 +85,10 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
         }
     }
     computeNormal();
-
+    constructTriangles();
+    constructBSPTree();
     f.close();
+    printf("Mesh %s loaded\n", filename);
 }
 
 void Mesh::computeNormal() {
@@ -97,4 +100,18 @@ void Mesh::computeNormal() {
         b = Vector3f::cross(a, b);
         n[triId] = b / b.length();
     }
+}
+
+void Mesh::constructTriangles() {
+    for (int triId = 0; triId < (int) t.size(); ++triId) {
+        TriangleIndex& triIndex = t[triId];
+        auto triangle = new Triangle(v[triIndex[0]],
+                          v[triIndex[1]], v[triIndex[2]], material);
+        triangle->normal = n[triId];
+        triangles.push_back(triangle);
+    }
+}
+
+void Mesh::constructBSPTree() {
+    bspTree = new BSPTree(triangles);
 }

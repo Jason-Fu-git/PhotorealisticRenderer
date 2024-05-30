@@ -16,6 +16,7 @@ SET(FINAL_PROJECT_SOURCES
         src/mesh.cpp
         src/scene_parser.cpp
         src/material.cpp
+        src/BSPTree.cpp
 )
 
 SET(FINAL_PROJECT_INCLUDES
@@ -35,6 +36,7 @@ SET(FINAL_PROJECT_INCLUDES
         include/triangle.hpp
         include/render.hpp
         include/utils.hpp
+        include/BSPTree.hpp
 )
 
 SET(CMAKE_CXX_STANDARD 11)

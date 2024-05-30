@@ -7,6 +7,7 @@
 #include <iostream>
 
 using namespace std;
+extern long long COUNT;
 
 // DONE: implement this class and add more fields as necessary,
 
@@ -34,6 +35,7 @@ public:
     }
 
     bool intersect(const Ray &ray, Hit &hit, float tmin) override {
+        ++COUNT;
         float original_length = ray.getDirection().length();
         // 采用重心坐标
         Vector3f E1 = _a - _b;
@@ -47,7 +49,6 @@ public:
             float gamma = Matrix3f(ray.getDirection().normalized(), E1, S).determinant() / det1;
 
             if (t > 0 && beta >= 0 && gamma >= 0 && beta + gamma <= 1) { // has intersection
-//                printf("hit triangle\n");
                 // 注：内外情况分类未处理
                 if (hit.getT() > t && t >= tmin) {
                     // 判断交点在物体内还是物体外
@@ -64,6 +65,15 @@ public:
             }
         }
         return false;
+    }
+
+
+    float getLowerBound(int axis) override {
+        return std::min(std::min(_a[axis], _b[axis]), _c[axis]);
+    }
+
+    float getUpperBound(int axis) override {
+        return std::max(std::max(_a[axis], _b[axis]), _c[axis]);
     }
 
 

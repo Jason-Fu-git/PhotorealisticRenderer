@@ -46,6 +46,14 @@ public:
         return std::make_pair(-1, -1);
     }
 
+    virtual float getLowerBound(int axis) {
+        return 0;
+    }
+
+    virtual float getUpperBound(int axis) {
+        return 0;
+    }
+
 protected:
     Material *material;
 };
