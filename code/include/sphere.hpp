@@ -20,12 +20,17 @@ public:
         // unit ball at the center
         _center = Vector3f::ZERO;
         _radius = 1.0;
+        theta_offset = 0.0;
+        phi_offset = 0.0;
     }
 
-    Sphere(const Vector3f &center, float radius, Material *material) : Object3D(material) {
+    Sphere(const Vector3f &center, float radius, Material *material, float theta_offset = 0.0, float phi_offset = 0.0)
+            : Object3D(material) {
         // constructor
         _center = center;
         _radius = radius;
+        this->phi_offset = phi_offset;
+        this->theta_offset = theta_offset;
     }
 
     ~Sphere() override = default;
@@ -60,19 +65,21 @@ public:
 
     std::pair<int, int>
     textureMap(float objectX, float objectY, float objectZ, int textureWidth, int textureHeight) override {
-        float x = objectX - _center.x();
-        float y = objectY - _center.y();
-        float z = objectZ - _center.z();
-        float theta = std::atan2(z, x); // xOz平面
-        float phi = std::acos(y / _radius); // y轴方向
-        float u = (M_PI + theta) / (2 * M_PI);
-        float v = (M_PI - phi) / M_PI;
+        double x = objectX - _center.x();
+        double y = objectY - _center.y();
+        double z = objectZ - _center.z();
+        double theta = std::atan2(z, x) + theta_offset; // xOz平面
+        double phi = std::acos(y / _radius) + phi_offset; // y轴方向
+        double u = mod((M_PI + theta) / (2 * M_PI), 1);
+        double v = mod((M_PI - phi) / M_PI, 1);
         return std::make_pair((int) (u * textureWidth), (int) (v * textureHeight));
     }
 
 protected:
     Vector3f _center;
     float _radius;
+    float theta_offset;
+    float phi_offset;
 };
 
 

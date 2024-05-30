@@ -8,6 +8,7 @@
 
 #include <cassert>
 #include <vecmath.h>
+#include <vector>
 
 class Camera;
 class Light;
@@ -96,6 +97,7 @@ private:
     Group *group;
 
     Light *parseSphereLight();
+    std::vector<Material*> materials_vec;
 };
 
 #endif // SCENE_PARSER_H

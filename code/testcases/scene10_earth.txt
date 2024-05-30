@@ -1,0 +1,51 @@
+
+PerspectiveCamera {
+    center 0 0 10
+    direction 0 0 -1
+    up 0 1 0
+    angle 30
+    width 500
+    height 500
+}
+
+Lights {
+    numLights 1
+    DirectionalLight {
+        direction 0 0 -1
+        color 1 1 1
+    }
+}
+
+Background {
+    color 0 0 0
+}
+
+Materials {
+    numMaterials 2
+    Material {
+      diffuseColor 1 0 0
+      texture texture/earth-diffuse-3k.ppm
+    }
+    Material {
+        diffuseColor 1 1 1
+	    texture texture/stars-1k.ppm
+	}
+}
+
+Group {
+    numObjects 2
+    MaterialIndex 0
+    Sphere {
+	    center 0 0 0
+        radius 2
+        thetaOffset 3.14
+        phiOffset -0.17
+    }
+    MaterialIndex 1
+    Plane {
+	    normal 0 0 -1
+        offset 5
+        scale 0.001
+    }
+}
+

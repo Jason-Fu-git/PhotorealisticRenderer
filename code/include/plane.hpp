@@ -24,11 +24,13 @@ public:
         _v = Vector3f(0, 1, 0);
         origin = Vector3f(0, 0, 0);
         _d = 0;
+        scale = 1.0f;
     }
 
-    Plane(const Vector3f &normal, float d, Material *m) : Object3D(m) {
+    Plane(const Vector3f &normal, float d, Material *m, float scale = 1.0f) : Object3D(m) {
         _normal = normal.normalized();
         _d = d;
+        this->scale = scale;
         // construct an orthonormal basis
         _u = Vector3f::cross((std::fabs(_normal.x()) > 0.1 ? Vector3f(0, 1, 0) : Vector3f(1, 0, 0)),
                              _normal).normalized();
@@ -62,10 +64,9 @@ public:
 
     std::pair<int, int>
     textureMap(float objectX, float objectY, float objectZ, int textureWidth, int textureHeight) override {
-        // compress the image to (10 * xx)
-        double compress_ratio = textureWidth / 2.0f;
-        double newWidth = 2.0f;
-        double newHeight = textureHeight / compress_ratio;
+        // compress the image
+        double newWidth = textureWidth * scale;
+        double newHeight = textureHeight * scale;
         // calculate the coordinate (x, y) on the plane
         Vector3f dir = Vector3f(objectX, objectY, objectZ) - origin;
         double length = dir.length();
@@ -76,8 +77,6 @@ public:
         // convert
         double u = mod(x, newWidth) / newWidth;
         double v = mod(y, newHeight) / newHeight;
-//        if(fabs(x) < 10 && fabs(y) < 10)
-//            printf("x = %f, y = %f, length=%f\n", x, y, length);
         // convert it to the texture coordinate
         return std::make_pair(std::floor(u * textureWidth), std::floor(v * textureHeight));
     }
@@ -85,6 +84,7 @@ public:
     Vector3f _normal;
 protected:
     float _d;
+    float scale;
     Vector3f _u, _v;
     Vector3f origin;
 

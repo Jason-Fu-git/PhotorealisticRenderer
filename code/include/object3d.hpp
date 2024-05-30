@@ -21,12 +21,8 @@ class Object3D {
 public:
     Object3D() : material(nullptr) {}
 
-    virtual ~Object3D() {
-        if(material != nullptr) {
-            delete material;
-            material = nullptr;
-        }
-    };
+    // material 在合适时机析构
+    virtual ~Object3D() = default;
 
     explicit Object3D(Material *material) {
         this->material = material;
@@ -51,7 +47,6 @@ public:
     }
 
 protected:
-
     Material *material;
 };
 

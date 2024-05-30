@@ -47,6 +47,7 @@ public:
             float gamma = Matrix3f(ray.getDirection().normalized(), E1, S).determinant() / det1;
 
             if (t > 0 && beta >= 0 && gamma >= 0 && beta + gamma <= 1) { // has intersection
+//                printf("hit triangle\n");
                 // 注：内外情况分类未处理
                 if (hit.getT() > t && t >= tmin) {
                     // 判断交点在物体内还是物体外

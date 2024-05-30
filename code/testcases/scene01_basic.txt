@@ -23,17 +23,11 @@ Background {
 Materials {
     numMaterials 4
     Material {
-      reflectiveCoefficient 0.0
-      refractiveCoefficient 0.5
-      refractiveIndex 1.5
       diffuseColor 1 0 0
       specularColor 1 1 1
       shininess 20
     }
     Material {
-        reflectiveCoefficient 0.0
-        refractiveCoefficient 0.5
-        refractiveIndex 1.5
         diffuseColor 0 1 0
     }
     Material {

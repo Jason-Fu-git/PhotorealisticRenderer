@@ -74,6 +74,10 @@ SceneParser::~SceneParser() {
         delete lights[i];
     }
     delete[] lights;
+    for(i = 0; i < materials_vec.size(); i++){
+        delete materials_vec[i];
+    }
+    materials_vec.clear();
 }
 
 // ====================================================================
@@ -393,6 +397,7 @@ Group *SceneParser::parseGroup() {
             assert (object != nullptr);
             answer->addObject(count, object);
             current_material->setObject(object);
+            materials_vec.push_back(current_material);
             count++;
         }
     }
@@ -407,6 +412,7 @@ Group *SceneParser::parseGroup() {
 // ====================================================================
 
 Sphere *SceneParser::parseSphere() {
+    float thetaOffset = 0.0, phiOffset = 0.0;
     char token[MAX_PARSER_TOKEN_LENGTH];
     getToken(token);
     assert (!strcmp(token, "{"));
@@ -417,13 +423,22 @@ Sphere *SceneParser::parseSphere() {
     assert (!strcmp(token, "radius"));
     float radius = readFloat();
     getToken(token);
+    if(!strcmp(token, "thetaOffset")){
+        thetaOffset = readFloat();
+        getToken(token);
+    }
+    if(!strcmp(token, "phiOffset")){
+        phiOffset = readFloat();
+        getToken(token);
+    }
     assert (!strcmp(token, "}"));
     assert (current_material != nullptr);
-    return new Sphere(center, radius, current_material);
+    return new Sphere(center, radius, current_material, thetaOffset, phiOffset);
 }
 
 
 Plane *SceneParser::parsePlane() {
+    float scale = 1.0f;
     char token[MAX_PARSER_TOKEN_LENGTH];
     getToken(token);
     assert (!strcmp(token, "{"));
@@ -434,9 +449,13 @@ Plane *SceneParser::parsePlane() {
     assert (!strcmp(token, "offset"));
     float offset = readFloat();
     getToken(token);
+    if(!strcmp(token, "scale")){
+        scale = readFloat();
+        getToken(token);
+    }
     assert (!strcmp(token, "}"));
     assert (current_material != nullptr);
-    return new Plane(normal, offset, current_material);
+    return new Plane(normal, offset, current_material, scale);
 }
 
 

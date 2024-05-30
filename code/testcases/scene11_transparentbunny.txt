@@ -1,0 +1,120 @@
+PerspectiveCamera {
+    center 50 52 295.6
+    direction 0 -0.042612 -1
+    up 0 1 0
+    angle 30
+    width 720
+    height 720
+}
+
+Lights {
+    numLights 1
+
+    SphereLight {
+         position 50 681.33 81.6
+         color 30 30 30
+         radius 600
+    }
+}
+
+Background {
+    color 0 0 0
+}
+
+Materials {
+    numMaterials 7
+    Material {
+        materialType 1
+        surfaceType 0
+        diffuseColor 0.75 0.25 0.25
+    }
+    Material {
+        materialType 1
+        surfaceType 0
+        diffuseColor 0.25 0.25 0.75
+    }
+    Material {
+        materialType 1
+        surfaceType 0
+        diffuseColor 0.75 0.75 0.75
+    }
+    Material {
+        materialType 1
+        surfaceType 0
+        diffuseColor 0 0 0
+    }
+    Material {
+        materialType 1
+        surfaceType 1
+        diffuseColor 1 1 1
+        refractiveCoefficient 0.0
+        reflectiveCoefficient 1.0
+    }
+    Material {
+        materialType 1
+        surfaceType 2
+        diffuseColor 1 1 1
+        refractiveCoefficient 1.0
+        refractiveIndex 1.5
+        reflectiveCoefficient 0.0
+    }
+    Material {
+        materialType 1
+        surfaceType 0
+        diffuseColor 0 0 0
+        emissionColor 30 30 30
+    }
+}
+
+Group {
+    numObjects 9
+    MaterialIndex 0
+    Plane {
+        normal 1 0.1 0
+        offset 1
+    }
+    MaterialIndex 1
+    Plane {
+        normal -1 0.1 0
+        offset -99
+    }
+    MaterialIndex 2
+    Plane {
+        normal 0 0.1 1
+        offset 0
+    }
+    MaterialIndex 3
+    Plane {
+        normal 0 0.1 -1
+        offset -300
+    }
+    MaterialIndex 2
+    Plane {
+        normal 0 1 0
+        offset 0
+    }
+    MaterialIndex 2
+    Plane {
+        normal 0 -1 0
+        offset -81.6
+    }
+    MaterialIndex 4
+    Sphere {
+    center 27 16.5 47
+        radius 16.5
+    }
+    MaterialIndex 5
+    Transform {
+            Translate  73 16.5 78
+    		Scale  100 100 100
+            TriangleMesh {
+                obj_file mesh/bunny_200.obj
+      }
+    }
+    MaterialIndex 6
+    Sphere {
+        center 50 681.33 81.6
+            radius 600
+        }
+}
+

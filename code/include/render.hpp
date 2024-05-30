@@ -30,8 +30,8 @@
  */
 class Renderer {
 public:
-    Renderer(SceneParser *parser, std::string output_path, int num_samples, bool print_progress = false)
-            : parser(parser), outputFile(std::move(output_path)), samples(num_samples), printProgress(print_progress) {}
+    Renderer(SceneParser *parser, std::string output_path, int num_samples)
+            : parser(parser), outputFile(std::move(output_path)), samples(num_samples){}
 
     virtual Vector3f intersectColor(Group *group, Ray ray, std::vector<Light *> &lights, Vector3f backgroundColor,
                                     float weight, int depth) = 0;
@@ -48,10 +48,9 @@ public:
         }
         // Then loop over each pixel in the image, shooting a ray through that pixel .
         // Write the color at the intersection to that pixel in your output image.
-//#pragma omp parallel for schedule(dynamic, 1)
+#pragma omp parallel for schedule(dynamic, 1)
         for (int y = 0; y < camera->getHeight(); y++) {
-            if (printProgress)
-                fprintf(stderr, "\rRendering (%d spp) %5.2f%%", samples * 4, 100. * y / (camera->getHeight() - 1));
+            fprintf(stderr, "\rRendering (%d spp) %5.2f%%", samples * 4, 100. * y / (camera->getHeight() - 1));
             for (int x = 0; x < camera->getWidth(); x++) {
                 Vector3f color = Vector3f::ZERO;
                 // anti-aliasing using 2*2 subpixel
@@ -178,7 +177,7 @@ private:
 class MonteCarloRenderer : public Renderer {
 public:
     MonteCarloRenderer(SceneParser *parser, std::string outputFile, int num_samples)
-            : Renderer(parser, std::move(outputFile), num_samples, true) {}
+            : Renderer(parser, std::move(outputFile), num_samples) {}
 
     /**
  * 光线追踪的Monte-Carlo实现，cos-weighted采样， RR终止

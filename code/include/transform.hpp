@@ -19,6 +19,18 @@ static Vector3f transformDirection(const Matrix4f &mat, const Vector3f &dir) {
     return (mat * Vector4f(dir, 0)).xyz();
 }
 
+/**
+ * @brief Transform class
+ *
+ * Transform is a class that represents a transformation in 3D space.
+ * It can be used to translate, rotate, or scale an object.
+ *
+ * @note It will transform the ray instead. And because of the way we implement the class, please configurate
+ * scale in the last.
+ *
+ * @var Scale : scale the coordinates of the obj file, a small number's impact may be trivial
+ * @var Translate : translate the coordinates of the obj file, calculate (a+x, b+y, c+z)
+ */
 class Transform : public Object3D {
 public:
     Transform() {}
