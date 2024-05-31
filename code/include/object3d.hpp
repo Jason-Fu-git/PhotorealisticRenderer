@@ -21,7 +21,7 @@ class Object3D {
 public:
     Object3D() : material(nullptr) {}
 
-    // material 在合适时机析构
+    // NOTE : material should be deleted externally!
     virtual ~Object3D() = default;
 
     explicit Object3D(Material *material) {

@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
     }
     renderer->render();
 
-    // 计算时间
+    // timer
     auto etime = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(etime - stime).count();
     cout << "time: " << (double) duration / 1000 << " s" << endl;

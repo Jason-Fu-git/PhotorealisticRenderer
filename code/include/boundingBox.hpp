@@ -10,7 +10,8 @@
 #include "plane.hpp"
 
 /**
- * 包围盒
+ * Bounding Box for an object.
+ * Used to fasten the ray-object intersection.
  * @author Jason Fu
  */
 class BoundingBox {
@@ -29,7 +30,7 @@ public:
 
     ~BoundingBox() = default;
 
-    // Woo算法的一个变式
+    // A variation of Woo's algorithm
     bool isIntersect(const Ray &ray) const {
         auto origin = ray.getOrigin();
         auto direction = ray.getDirection();

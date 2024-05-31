@@ -1,8 +1,3 @@
-/**
- * 光线跟踪函数实现
- * @author Jason Fu
- *
- */
 
 #ifndef RAY_TRACING_HPP
 #define RAY_TRACING_HPP
@@ -25,7 +20,7 @@
 #define MIN_WEIGHT 0.001
 
 /**
- * 渲染器
+ * Renderer base class, which handles the rendering process.
  * @author Jason Fu
  */
 class Renderer {
@@ -89,7 +84,7 @@ protected:
 
 
 /**
- * 光线追踪的Whitted-style渲染器
+ * Whitted-style ray tracing.
  * @author Jason Fu
  */
 class WhittedRenderer : public Renderer {
@@ -100,17 +95,16 @@ public:
             : Renderer(parser, std::move(outputFile), samples), maxDepth(max_depth) {}
 
     /**
- * 光线追踪的Whitted-style实现。
- * 注：两个物体不能挨在一起。
- * @param group 场景中的物体
- * @param ray 射线
- * @param lights 光源
- * @param backgroundColor 背景颜色
- * @param weight 当前着色的权重
- * @param depth 剩余递归深度
- * @return 多次反射/折射的累加，直至达到递归深度
- * @author Jason Fu
- */
+    * Whitted-style ray tracing.
+    * @param group objects in the scene
+    * @param ray ray from camera to point on the screen
+    * @param lights light sources
+    * @param backgroundColor
+    * @param weight
+    * @param depth
+    * @return ultimate color for the ray
+    * @author Jason Fu
+    */
     Vector3f intersectColor(Group *group, Ray ray, std::vector<Light *> &lights, Vector3f backgroundColor,
                             float weight, int depth) override {
         if (weight < MIN_WEIGHT || depth == maxDepth)
@@ -171,8 +165,8 @@ private:
 };
 
 /**
- * 光线追踪的Monte-Carlo实现，cos-weighted采样，RR终止
- * @copybrief 基于smallpt
+ * Monte-Carlo raytracing, cos-weighted sampling, RR termination
+ * Based on smallpt
  */
 class MonteCarloRenderer : public Renderer {
 public:
@@ -180,16 +174,8 @@ public:
             : Renderer(parser, std::move(outputFile), num_samples) {}
 
     /**
- * 光线追踪的Monte-Carlo实现，cos-weighted采样， RR终止
- * @param group 场景中的物体
- * @param ray 射线
- * @param lights 光源
- * @param backgroundColor 背景颜色
- * @param depth 递归深度
- * @return 本次采样得到的颜色
- * @author Kevin Beason (smallpt)
- * @note 如果要使用NEE，请添加SphereLight面光源
- */
+    * ACKNOWLEDGEMENT : Kevin Beason
+    */
     Vector3f intersectColor(Group *group, Ray ray, std::vector<Light *> &lights, Vector3f backgroundColor,
                             float weight, int depth) override {
         Hit hit;

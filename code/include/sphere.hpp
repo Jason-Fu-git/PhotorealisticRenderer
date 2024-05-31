@@ -8,11 +8,10 @@
 
 
 /**
- * @copybrief 项目所有者独立实现
- * @author Jason Fu
  * @brief Sphere class
  * @var _center
  * @var _radius
+ * @author Jason Fu
  */
 class Sphere : public Object3D {
 public:

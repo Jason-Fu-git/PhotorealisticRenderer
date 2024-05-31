@@ -23,19 +23,19 @@ public:
     virtual ~Light() = default;
 
     /**
-     * 获取某点的光照
-     * @param p 该点的坐标
-     * @param dir 将被修改：从该点到光源的方向向量
-     * @param col 将被修改：该点的光照颜色
+     * Get the illumination intensity at a given point p
+     * @param p the point in the scene
+     * @param dir WILL BE MODIFIED : vector from p to origin
+     * @param col WILL BE MODIFIED : the color of the light
      */
     virtual void getIllumination(const Vector3f &p, Vector3f &dir, Vector3f &col) const = 0;
 
     /**
-     * 判断某点是否在阴影中。
-     * @param p 该点的坐标
-     * @param dir 从该点到光源的方向向量 (MAYBE UNUSED)
-     * @param group 场景
-     * @return true 表示在阴影中，false 表示不在阴影中
+     * Determine whether p is in the shadow
+     * @param p the point in the scene
+     * @param dir MAYBE UNUSED : vector from p to origin
+     * @param group the group of objects in the scene
+     * @return
      */
     virtual bool isInShadow(const Vector3f &p, Group *group, const Vector3f &dir) const = 0;
 };
@@ -118,7 +118,7 @@ private:
 };
 
 /**
- * 面光源（球面）
+ * A sphere light
  * @author Jason FU
  *
  */
@@ -128,15 +128,14 @@ public:
 
     ~SphereLight() override = default;
 
-    // 计算dir，并返回emissionColor，真正的color需自行计算
+    // NOTE : the color it returns should be multiplied by <dir, normal> externally
     void getIllumination(const Vector3f &p, Vector3f &dir, Vector3f &col) const override {
-        // 在采样点p建立空间直角坐标系 (w, u, v)
+        // construct (w, u, v)
         Vector3f w = (position - p).normalized();
         Vector3f u = Vector3f::cross((std::fabs(w.x()) > 0.1 ? Vector3f(0, 1, 0) : Vector3f(1, 0, 0)), w).normalized();
         Vector3f v = Vector3f::cross(w, u).normalized();
-        // 最大张角
         float cos_theta_max = std::sqrt(1 - (radius * radius) / Vector3f::dot(position - p, position - p));
-        // 随机生成光线
+        // Randomly generate the ray
         float eps1 = uniform01(), eps2 = uniform01();
         float cos_theta = 1 - eps1 + eps1 * cos_theta_max;
         if (cos_theta > 1) // illegal
@@ -149,7 +148,7 @@ public:
         float phi = 2 * M_PI * eps2;
         dir = u * std::cos(phi) * sin_theta + v * std::sin(phi) * sin_theta + w * cos_theta;
         dir = dir.normalized();
-        // 2 * PI * (1 - cos_theta_max) = 1 / p,    1 / PI 是 BRDF材质的要求
+        // 2 * PI * (1 - cos_theta_max) = 1 / p,    1 / PI is the requirement of BRDF material
         col = emissionColor * 2 * M_PI * (1 - cos_theta_max) * M_1_PI;
     }
 

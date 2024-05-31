@@ -10,11 +10,10 @@
 // function: ax+by+cz=d
 
 /**
- * @copybrief 项目所有者独立实现
- * @author Jason Fu
  * @brief Plane class, function : _normal.x*x + _normal.y*y + _normal.z*z = _d
  * @var _normal
  * @var _d
+ * @author Jason Fu
  */
 class Plane : public Object3D {
 public:
@@ -49,7 +48,7 @@ public:
         if (a != 0) {
             float t = -(-_d + Vector3f::dot(_normal, r.getOrigin())) / a / original_length;
             if (t > 0 && t > tmin && t < h.getT()) { // valid intersection
-                // 判断交点在物体内还是物体外
+                // Determine whether the intersection point is inside the plane
                 Vector3f normal = _normal;
                 bool isInside = false;
                 if (Vector3f::dot(_normal, r.getDirection()) > 0) {

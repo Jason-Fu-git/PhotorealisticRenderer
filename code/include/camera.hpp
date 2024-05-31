@@ -43,9 +43,8 @@ protected:
 };
 
 /**
- * @copybrief 项目所有者独立实现
+ * A camera based on the pin-hole model.
  * @author Jason Fu
- *
  */
 class PerspectiveCamera : public Camera {
 

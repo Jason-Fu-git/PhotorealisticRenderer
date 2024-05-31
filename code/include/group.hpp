@@ -10,9 +10,8 @@
 
 
 /**
- * @copybrief 项目所有者独立实现
+ * Container of objects based on vector
  * @author Jason Fu
- * @brief 存储Object3D的数据结构，简单用向量实现
  *
  */
 class Group : public Object3D {

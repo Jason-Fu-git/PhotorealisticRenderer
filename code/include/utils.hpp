@@ -1,3 +1,7 @@
+/**
+ * @author Jason Fu
+ */
+
 #ifndef UTILS_RANDOM_HPP
 #define UTILS_RANDOM_HPP
 
@@ -7,7 +11,6 @@
 /**
  * Seeds the random number generator.
  * @param s seed
- * @author Jason Fu
  */
 inline void seed(unsigned int s) {
     srand(s);

@@ -9,16 +9,16 @@
 using namespace std;
 extern long long COUNT;
 
-// DONE: implement this class and add more fields as necessary,
 
 /**
- * @copybrief 项目所有者独立实现
- * @author Jason Fu
+ *
  * @brief Triangle class
  * @var _a : Vertex A
  * @var _b : Vertex B
  * @var _c : Vertex C
  * @var normal : Normal vector of the triangle
+ * @author Jason Fu
+ *
  */
 class Triangle : public Object3D {
 

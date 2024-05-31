@@ -14,10 +14,8 @@
 class Object3D;
 
 /**
- * @copybrief 项目所有者独立实现
+ * Base class for material.
  * @author Jason Fu
- * @brief Phong模型着色，可以设置反射与折射的光学性质，注意若折射系数/反射系数为0，则不会进行折射/反射计算
- *
  */
 class Material {
 public:
@@ -116,15 +114,18 @@ protected:
     Vector3f diffuseColor;
     Object3D *object{}; // the object that this material belongs to
     Image *texture{};
-    float refractive_index{}; // 折射率
-    float refractive_coefficient{}; // 折射系数
-    float reflective_coefficient{}; // 反射系数
-    int type{}; // 材料类型
+    float refractive_index{};
+    float refractive_coefficient{};
+    float reflective_coefficient{};
+    int type{};
 };
 
 /**
- * Phong模型着色，可以设置反射与折射的光学性质，注意若折射系数/反射系数为0，则不会进行折射/反射计算
+ *
+ * Typical Phong material. You can set its reflectivity and transparency properties.
+ * Reflection and refraction will be calculated only when the corresponding coefficient is greater than zero.
  * @author Jason Fu
+ *
  */
 class PhongMaterial : public Material {
 public:
@@ -155,7 +156,7 @@ protected:
 };
 
 /**
- * 简单的BRDF材质实现
+ * Simple BRDF Material
  * @author Jason Fu
  */
 class BRDFMaterial : public Material {
