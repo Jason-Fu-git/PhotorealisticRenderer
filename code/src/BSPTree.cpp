@@ -6,16 +6,18 @@
 #include "object3d.hpp"
 #include <algorithm>
 
+#define TOLERANCE 0.01
+
 BSPTree::BSPTree(std::vector<Object3D *> &objects) {
-    root = construct(objects, AXIS_X);
+    root = construct(objects, Ray::X_AXIS);
 }
 
 BSPTree::~BSPTree() {
     delete root;
 }
 
-bool BSPTree::intersect(const Ray &r, Hit &h, float tmin) {
-    return intersect(root, r, h, tmin);
+bool BSPTree::intersect(const Ray &r, Hit &h, float tmin, float tmax) {
+    return intersect(root, r, h, tmin, tmax);
 }
 
 // left : lb <= pivot
@@ -70,32 +72,44 @@ BSPTree::Node *BSPTree::construct(std::vector<Object3D *> &objects, int axis) {
     return node;
 }
 
-bool BSPTree::intersect(BSPTree::Node *node, const Ray &r, Hit &h, float tmin) {
+bool BSPTree::intersect(BSPTree::Node *node, const Ray &r, Hit &h, float tmin, float tmax) {
     bool isIntersect = false;
     if (node) {
         // leaf node
         if (node->size > 0) {
-            for (int i = 0; i < node->size; i++)
+            for (int i = 0; i < node->size; i++) {
                 isIntersect |= node->objects[i]->intersect(r, h, tmin);
+            }
+
             return isIntersect;
         }
-        // non-leaf node, make recursive call
-        if (intersectLeft(node, r)) {
-            isIntersect |= intersect(node->lc, r, h, tmin);
+        // non-leaf node, first calculate distance
+        float t = r.parameterAtPoint(node->split, node->axis);
+        // then judge the near and far side
+        Node *near = node->lc, *far = node->rc;
+        if (node->axis == Ray::X_AXIS && r.getOrigin()[Ray::X_AXIS] > node->split) {
+            near = node->rc;
+            far = node->lc;
+        } else if (node->axis == Ray::Y_AXIS && r.getOrigin()[Ray::Y_AXIS] > node->split) {
+            near = node->rc;
+            far = node->lc;
+        } else if (node->axis == Ray::Z_AXIS && r.getOrigin()[Ray::Z_AXIS] > node->split) {
+            near = node->rc;
+            far = node->lc;
         }
-        if (intersectRight(node, r)) {
-            isIntersect |= intersect(node->rc, r, h, tmin);
+
+        // finally calculate intersection
+        if (t > tmax + TOLERANCE || t < -TOLERANCE)
+            isIntersect |= intersect(near, r, h, tmin, tmax);
+        else if (t < tmin - TOLERANCE)
+            isIntersect |= intersect(far, r, h, tmin, tmax);
+        else {
+            // intersect with both nodes
+            isIntersect |= intersect(near, r, h, tmin, t);
+            isIntersect |= intersect(far, r, h, t, tmax);
         }
     }
     return isIntersect;
-}
-
-bool BSPTree::intersectLeft(BSPTree::Node *node, const Ray &r) {
-    return r.getOrigin()[node->axis] <= node->split || r.getDirection()[node->axis] < 0;
-}
-
-bool BSPTree::intersectRight(BSPTree::Node *node, const Ray &r) {
-    return r.getOrigin()[node->axis] >= node->split || r.getDirection()[node->axis] > 0;
 }
 
 

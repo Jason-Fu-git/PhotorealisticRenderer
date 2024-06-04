@@ -25,11 +25,6 @@ class Hit;
 
 class BSPTree {
 public:
-    enum Axis {
-        AXIS_X = 0,
-        AXIS_Y = 1,
-        AXIS_Z = 2
-    };
 
     /**
      * Node in the BSP Tree
@@ -39,11 +34,11 @@ public:
         Node *rc; // right children
         Object3D **objects; // the objects in this node
 
-        double split; // the value to split
+        float split; // the value to split
         int axis;   // along which axis to split
         int size; // only leaf node stores data
 
-        Node(int _axis, double _split, int _size = 0) :
+        Node(int _axis, float _split, int _size = 0) :
                 axis(_axis), split(_split), size(_size), lc(nullptr), rc(nullptr), objects(nullptr) {}
 
         ~Node() {
@@ -57,7 +52,7 @@ public:
      * Construct the BSP Tree
      * @param objects the objects that will be stored in the tree
      */
-    BSPTree(std::vector<Object3D *> &objects);
+    explicit BSPTree(std::vector<Object3D *> &objects);
 
     ~BSPTree();
 
@@ -66,9 +61,10 @@ public:
      * @param r the target ray
      * @param h if hit, the information of the hit point
      * @param tmin the minimum tolerance of the t value
+     * @param tmax the maximum tolerance of the t value
      * @return whether the ray intersects with the BSP Tree
      */
-    bool intersect(const Ray &r, Hit &h, float tmin);
+    bool intersect(const Ray &r, Hit &h, float tmin, float tmax);
 
 private:
     /**
@@ -79,11 +75,7 @@ private:
      */
     Node *construct(std::vector<Object3D *> &objects, int axis);
 
-    bool intersect(Node *node, const Ray &r, Hit &h, float tmin);
-
-    static inline bool intersectLeft(Node *node, const Ray &r);
-
-    static inline bool intersectRight(Node *node, const Ray &r);
+    bool intersect(Node *node, const Ray &r, Hit &h, float tmin, float tmax);
 
     Node *root;
 };

@@ -17,6 +17,11 @@
 // Note : the direction of ray cannot be normalized, in case of transformation occurs!
 class Ray {
 public:
+    enum Axis {
+        X_AXIS,
+        Y_AXIS,
+        Z_AXIS
+    };
 
     Ray() = delete;
 
@@ -40,6 +45,23 @@ public:
 
     Vector3f pointAtParameter(float t) const {
         return origin + direction * t;
+    }
+
+    float parameterAtPoint(float c, int axis) const {
+        switch (axis) {
+            case X_AXIS:
+                return (c - origin.x()) / direction.x();
+                break;
+            case Y_AXIS:
+                return (c - origin.y()) / direction.y();
+                break;
+            case Z_AXIS:
+                return (c - origin.z()) / direction.z();
+                break;
+            default:
+                printf("Error: invalid axis");
+                exit(-1);
+        }
     }
 
 private:

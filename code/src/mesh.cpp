@@ -13,18 +13,13 @@
 
 bool Mesh::intersect(const Ray &r, Hit &h, float tmin) {
     // First intersect with the Bounding Box
-    if (!bbox->isIntersect(r)){
+    float t_min = tmin;
+    float t_max = 1e38;
+    if (!bbox->isIntersect(r, t_min, t_max)){
         return false;
     }
-    // Optional: Change this brute force method into a faster one.
-    bool result = false;
-    for (int triId = 0; triId < (int) t.size(); ++triId) {
-        TriangleIndex &triIndex = t[triId];
-        Triangle triangle(v[triIndex[0]],
-                          v[triIndex[1]], v[triIndex[2]], material);
-        triangle.normal = n[triId];
-        result |= triangle.intersect(r, h, tmin);
-    }
+    // Use BSP to fasten the intersection process
+    bool result = bspTree->intersect(r, h, t_min, t_max);
     return result;
 }
 
