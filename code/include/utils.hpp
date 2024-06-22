@@ -36,11 +36,11 @@ inline double uniform01() {
  * @author Jason Fu
  * @copybrief inspired by smallpt
  */
-inline double clamp(double x, double min, double max) {
+inline float clamp(float x, float min, float max) {
     return std::min(max, std::max(min, x));
 }
 
-inline Vector3f clamp(const Vector3f &x, double min, double max) {
+inline Vector3f clamp(const Vector3f &x, float min, float max) {
     return Vector3f(clamp(x.x(), min, max), clamp(x.y(), min, max), clamp(x.z(), min, max));
 }
 
@@ -79,5 +79,36 @@ inline bool hasEnding (std::string const &fullString, std::string const &ending)
 inline double mod(double x, double y) {
     return fmod(fmod(x, y) + y, y);
 }
+
+
+/**
+ * calculate k!
+ * @param k
+ * @return
+ */
+inline int fac(int k) {
+    int res = 1;
+    for (int i = 1; i <= k; i++) {
+        res *= i;
+    }
+    return res;
+}
+
+
+/**
+ * calculate the combination number C_n^k
+ * @param k
+ * @param n
+ * @return
+ */
+inline int comb(int k, int n) {
+    return fac(n) / (fac(k) * fac(n - k));
+}
+
+
+inline float square(float x) {
+    return x * x;
+}
+
 
 #endif // UTILS_RANDOM_HPP

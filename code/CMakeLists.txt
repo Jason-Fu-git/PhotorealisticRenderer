@@ -9,6 +9,7 @@ ADD_SUBDIRECTORY(deps/vecmath)
 
 # Add compiler options
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fopenmp")
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
 SET(FINAL_PROJECT_SOURCES
         src/image.cpp
@@ -38,6 +39,8 @@ SET(FINAL_PROJECT_INCLUDES
         include/utils.hpp
         include/BSPTree.hpp
         include/boundingBox.hpp
+        include/curve.hpp
+        include/revsurface.hpp
 )
 
 SET(CMAKE_CXX_STANDARD 11)

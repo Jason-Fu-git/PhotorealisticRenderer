@@ -124,7 +124,7 @@ private:
  */
 class SphereLight : public Light {
 public:
-    SphereLight(Vector3f &p, float r, Vector3f &e_color) : position(p), radius(r), emissionColor(e_color){}
+    SphereLight(Vector3f &p, float r, Vector3f &e_color) : position(p), radius(r), emissionColor(e_color) {}
 
     ~SphereLight() override = default;
 
@@ -155,12 +155,21 @@ public:
     // NOTE : dir is used!
     bool isInShadow(const Vector3f &p, Group *group, const Vector3f &dir) const override {
         if (dir != Vector3f::ZERO) {
-            Vector3f origin = position + dir * radius;
-            Ray r(origin, dir);
+            // aid
+            float tmin = (position - p).length();
+            Vector3f ldir = -dir;
+            Ray r(p, ldir);
             Hit hit;
-            if (group->intersect(r, hit, 0)) {
+            if (group->intersect(r, hit, TOLERANCE)) {
                 Vector3f intersectionPoint = r.pointAtParameter(hit.getT());
-                if (Vector3f::dot(intersectionPoint - p, intersectionPoint - p) <= TOLERANCE) {
+                // exceeds (due to precision error)
+                if(hit.getT() > tmin){
+                    return false;
+                }
+
+                // intersects
+                if (abs(radius * radius - Vector3f::dot(intersectionPoint - position, intersectionPoint - position)) <=
+                    TOLERANCE * 10) {
                     return false;
                 }
             }

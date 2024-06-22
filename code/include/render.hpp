@@ -221,11 +221,10 @@ public:
                 if (!light->isInShadow(ray.pointAtParameter(hit.getT()), group, -ldir)) {
                     nee_color += lc * std::max(Vector3f::dot(ldir, hit.getNormal()), 0.0f);
                 }
-
             }
             // 递归
-            final_color = e_color + nee_color +
-                          color * intersectColor(group, rfl_ray, lights, backgroundColor, weight, depth);
+            final_color = e_color +
+                          color * (nee_color + intersectColor(group, rfl_ray, lights, backgroundColor, weight, depth));
         } else if (type == Material::SPECULAR) { // 镜面反射
             // 生成反射光线
             Ray *rfl_ray = reflect(ray, hit.getNormal(), ray.pointAtParameter(hit.getT() - DISTURBANCE));
