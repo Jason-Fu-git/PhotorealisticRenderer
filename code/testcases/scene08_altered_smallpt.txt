@@ -1,5 +1,5 @@
 PerspectiveCamera {
-    center 50 52 295.6
+    center 50 60 295.6
     direction 0 -0.042612 -1
     up 0 1 0
     angle 30
@@ -8,18 +8,10 @@ PerspectiveCamera {
 }
 
 Lights {
-    numLights 3
+    numLights 1
     DirectionalLight {
-        direction 0 1 0
+        direction 0 0 -1
         color 0.5 0.5 0.5
-    }
-    PointLight {
-      position 50 60 70
-      color 0.5 0.5 0.5
-    }
-    PointLight {
-        position 50 50 50
-        color 0.9 0.9 0.9
     }
 }
 
@@ -95,11 +87,20 @@ Group {
     center 27 16.5 47
         radius 16.5
     }
-    MaterialIndex 5
-    Sphere {
-    center 73 16.5 78
-        radius 16.5
-    }
+    MaterialIndex 0
+            Transform {
+                Translate  70 30 60
+                Scale  5 5 5
+                RevSurface {
+                     profile BezierCurve {
+                         controls
+                             [ -1 2 0 ]
+                             [ 0 0 0 ]
+                             [ -3.5 -2 0 ]
+                             [ -1.5 -5 0 ]
+                        }
+                     }
+        }
 
 
 }

@@ -20,6 +20,8 @@ class Mesh : public Object3D {
 public:
     Mesh(const char *filename, Material *m);
 
+    Mesh(std::vector<Triangle*> &trigs, Material *m);
+
     ~Mesh() override {
         for (auto obj: triangles) {
             delete obj;
@@ -42,9 +44,6 @@ public:
         int x[3]{};
     };
 
-    std::vector<Vector3f> v;
-    std::vector<TriangleIndex> t;
-    std::vector<Vector3f> n;
     std::vector<Object3D *> triangles;
 
     bool intersect(const Ray &r, Hit &h, float tmin) override;

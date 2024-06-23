@@ -24,6 +24,9 @@ bool Mesh::intersect(const Ray &r, Hit &h, float tmin) {
 }
 
 Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
+    std::vector<Vector3f> v;
+    std::vector<TriangleIndex> t;
+    std::vector<Vector3f> n;
 
     // Optional: Use tiny obj loader to replace this simple one.
     float x0 = FLT_MAX, x1 = -FLT_MAX, y0 = FLT_MAX, y1 = -FLT_MAX, z0 = FLT_MAX, z1 = -FLT_MAX;
@@ -113,5 +116,28 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
     bspTree = new BSPTree(triangles);
     f.close();
     printf("Mesh %s loaded\n", filename);
+}
+
+Mesh::Mesh(vector<Triangle*> &trigs, Material *m) {
+    triangles.assign(trigs.begin(), trigs.end());
+    material = m;
+    // create bounding box
+    float x0 = FLT_MAX, x1 = -FLT_MAX, y0 = FLT_MAX, y1 = -FLT_MAX, z0 = FLT_MAX, z1 = -FLT_MAX;
+    for(auto triangle : triangles) {
+        x0 = min(x0, triangle->getLowerBound(Ray::X_AXIS));
+        x1 = max(x1, triangle->getUpperBound(Ray::X_AXIS));
+
+        y0 = min(y0, triangle->getLowerBound(Ray::Y_AXIS));
+        y1 = max(y1, triangle->getUpperBound(Ray::Y_AXIS));
+
+        z0 = min(z0, triangle->getLowerBound(Ray::Z_AXIS));
+        z1 = max(z1, triangle->getUpperBound(Ray::Z_AXIS));
+    }
+    bbox = new BoundingBox(x0 - 0.01, x1 + 0.01,
+                           y0 - 0.01, y1 + 0.01,
+                           z0 - 0.01, z1 + 0.01);
+    // construct other fields
+    bspTree = new BSPTree(triangles);
+    printf("Mesh loaded");
 }
 
