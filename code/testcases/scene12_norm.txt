@@ -23,10 +23,9 @@ Background {
 Materials {
     numMaterials 1
     Material {
-	  diffuseColor 0.9 0.9 1
-	  specularColor 0.7 0.7 0.7
-	  shininess 20
-	}
+      diffuseColor 1 1 1
+      texture texture/vase.ppm
+   }
 }
 
 Group {
