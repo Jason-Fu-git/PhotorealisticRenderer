@@ -76,7 +76,7 @@ SceneParser::~SceneParser() {
         delete lights[i];
     }
     delete[] lights;
-    for(i = 0; i < materials_vec.size(); i++){
+    for (i = 0; i < materials_vec.size(); i++) {
         delete materials_vec[i];
     }
     materials_vec.clear();
@@ -138,8 +138,18 @@ void SceneParser::parsePerspectiveCamera() {
     assert (!strcmp(token, "height"));
     int height = readInt();
     getToken(token);
+    float aperture = 0.0f;
+    if (!strcmp(token, "aperture")) {
+        aperture = readFloat();
+        getToken(token);
+    }
+    float focus = 1.0f;
+    if (!strcmp(token, "focus")) {
+        focus = readFloat();
+        getToken(token);
+    }
     assert (!strcmp(token, "}"));
-    camera = new PerspectiveCamera(center, direction, up, width, height, angle_radians);
+    camera = new PerspectiveCamera(center, direction, up, width, height, angle_radians, aperture, focus);
 }
 
 void SceneParser::parseBackground() {
@@ -427,11 +437,11 @@ Sphere *SceneParser::parseSphere() {
     assert (!strcmp(token, "radius"));
     float radius = readFloat();
     getToken(token);
-    if(!strcmp(token, "thetaOffset")){
+    if (!strcmp(token, "thetaOffset")) {
         thetaOffset = readFloat();
         getToken(token);
     }
-    if(!strcmp(token, "phiOffset")){
+    if (!strcmp(token, "phiOffset")) {
         phiOffset = readFloat();
         getToken(token);
     }
@@ -453,7 +463,7 @@ Plane *SceneParser::parsePlane() {
     assert (!strcmp(token, "offset"));
     float offset = readFloat();
     getToken(token);
-    if(!strcmp(token, "scale")){
+    if (!strcmp(token, "scale")) {
         scale = readFloat();
         getToken(token);
     }
@@ -518,7 +528,7 @@ RevSurface *SceneParser::parseRevSurface() {
     assert (!strcmp(token, "{"));
     getToken(token);
     assert (!strcmp(token, "profile"));
-    Curve* profile;
+    Curve *profile;
     getToken(token);
     if (!strcmp(token, "BezierCurve")) {
         profile = parseBezierCurve();

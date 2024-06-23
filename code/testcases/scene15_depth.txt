@@ -1,30 +1,28 @@
 PerspectiveCamera {
-    center 50 52 295.6
-    direction 0 -0.042612 -1
+    center 50 50 300
+    direction 0 0 -1
     up 0 1 0
-    angle 30
-    width 480
-    height 480
+    angle 35
+    width 720
+    height 720
+    aperture 2.0
+    focus 250
 }
 
 Lights {
-    numLights 3
+    numLights 2
 
     SphereLight {
-         position 50 681.33 181.6
-         color 30 30 30
-         radius 600
+         position 50 65 81.6
+         color 500 500 500
+         radius 1.5
     }
 
-    DirectionalLight {
-      direction 0 1 0
-      color 0.1 0.1 0.1
-    }
-
-    PointLight {
-      position 50 60 70
-      color 0.1 0.1 0.1
-    }
+    SphereLight {
+             position 50 65 200
+             color 500 500 500
+             radius 1.5
+        }
 }
 
 Background {
@@ -32,7 +30,7 @@ Background {
 }
 
 Materials {
-    numMaterials 7
+    numMaterials 8
     Material {
         materialType 1
         surfaceType 0
@@ -72,30 +70,36 @@ Materials {
         materialType 1
         surfaceType 0
         diffuseColor 0 0 0
-        emissionColor 30 30 30
+        emissionColor 500 500 500
     }
+    Material {
+            materialType 1
+            surfaceType 0
+            diffuseColor 0 0 0
+            emissionColor 30 30 30
+        }
 }
 
 Group {
-    numObjects 8
+    numObjects 10
     MaterialIndex 0
     Plane {
-        normal 1 0.1 0
-        offset 1
+        normal 1 0 0
+        offset 0
     }
     MaterialIndex 1
     Plane {
-        normal -1 0.1 0
-        offset -99
+        normal -1 0 0
+        offset -100
     }
     MaterialIndex 2
     Plane {
-        normal 0 0.1 1
+        normal 0 0 1
         offset 0
     }
     MaterialIndex 3
     Plane {
-        normal 0 0.1 -1
+        normal 0 0 -1
         offset -300
     }
     MaterialIndex 2
@@ -106,20 +110,32 @@ Group {
     MaterialIndex 2
     Plane {
         normal 0 -1 0
-        offset -81.6
+        offset -100
     }
-    MaterialIndex 5
-    Transform {
-            Translate  60 -5 50
-    		Scale  200 200 200
-            TriangleMesh {
-                obj_file mesh/bunny_200.obj
-      }
+    MaterialIndex 1
+        Transform {
+                Translate  32 -5 47
+        		Scale  100 100 100
+                TriangleMesh {
+                    obj_file mesh/bunny_200.obj
+          }
     }
+    MaterialIndex 0
+        Transform {
+                Translate  75 -5 112
+        		Scale  100 100 100
+                TriangleMesh {
+                    obj_file mesh/bunny_200.obj
+          }
+        }
     MaterialIndex 6
     Sphere {
-        center 50 681.33 181.6
-            radius 600
+        center 50 65 81.6
+            radius 1.5
         }
+    MaterialIndex 6
+        Sphere {
+            center 50 65 200
+                radius 1.5
+            }
 }
-

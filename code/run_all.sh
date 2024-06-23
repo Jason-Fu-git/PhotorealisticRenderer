@@ -14,6 +14,10 @@ build/FinalProject whitted testcases/scene05_bunny_200.txt output/scene05.bmp
 build/FinalProject whitted testcases/scene06_bunny_1k.txt output/scene06.bmp
 build/FinalProject whitted testcases/scene07_shine.txt output/scene07.bmp
 build/FinalProject whitted testcases/scene08_altered_smallpt.txt output/scene08.bmp
-build/FinalProject monteCarlo testcases/scene09_altered_smallpt_2.txt output/scene09.bmp 100
+build/FinalProject monteCarlo testcases/scene09_smallpt.txt output/scene09.bmp 100
 build/FinalProject whitted testcases/scene10_earth.txt output/scene10.bmp
-build/FinalProject monteCarlo testcases/scene11_transparentbunny.txt output/scene11.bmp 100
+build/FinalProject monteCarlo testcases/scene11_transparentbunny.txt output/scene11.bmp 16
+build/FinalProject whitted testcases/scene12_norm.txt output/scene12.bmp
+build/FinalProject monteCarlo testcases/scene13_vase.txt output/scene13.bmp 16
+build/FinalProject monteCarlo testcases/scene14_nee.txt output/scene14.bmp 16
+build/FinalProject monteCarlo testcases/scene15_depth.txt output/scene14.bmp 16

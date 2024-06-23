@@ -2,8 +2,9 @@
 #define CAMERA_H
 
 #include "ray.hpp"
+#include "utils.hpp"
 #include <vecmath.h>
-#include <float.h>
+#include <cfloat>
 #include <cmath>
 
 /**
@@ -50,23 +51,34 @@ class PerspectiveCamera : public Camera {
 
 public:
     PerspectiveCamera(const Vector3f &center, const Vector3f &direction,
-                      const Vector3f &up, int imgW, int imgH, float angle) : Camera(center, direction, up, imgW, imgH) {
+                      const Vector3f &up, int imgW, int imgH, float angle,
+                      float _aperture = 0.0f, float _focus_plane=1.0f) : Camera(center, direction, up, imgW, imgH) {
         // angle is in radian.
-        fx = imgW / (2.0f * std::tan(angle / 2.0f));
-        fy = imgH / (2.0f * std::tan(angle / 2.0f));
+        aperture = _aperture;
+        focus_plane = _focus_plane;
+        fx = imgW / (2.0f * std::tan(angle / 2.0f) * focus_plane);
+        fy = imgH / (2.0f * std::tan(angle / 2.0f) * focus_plane);
+        printf("fx: %f, fy: %f, aperture: %f, focus_plane: %f\n", fx, fy, aperture, focus_plane);
     }
 
     Ray generateRay(const Vector2f &point) override {
-        Vector3f dRc = Vector3f((point.x() - width / 2.0f) / fx, (point.y() - height / 2.0f) / fy, 1).normalized();
-        Vector3f ORw = center;
+        auto p = randomPointInCircle(aperture);
+        Vector3f focusPoint = Vector3f((point.x() - width / 2.0f) / fx, (point.y() - height / 2.0f) / fy,  focus_plane);
+        Vector3f ORc = Vector3f(p.first, p.second, 0);
+        Vector3f dRc = (focusPoint - ORc).normalized();
+        // to the world space
+        Vector3f ORw = center + horizontal * p.first - up * p.second;
         Matrix3f R = Matrix3f(horizontal, -up, direction);
         Vector3f dRw = (R * dRc).normalized();
+//        printf("dRw: %f, %f, %f, dRc: %f %f %f\n", dRw.x(), dRw.y(), dRw.z(), dRc.x(), dRc.y(), dRc.z());
         return Ray(ORw, dRw);
     }
 
 private:
     float fx;
     float fy;
+    float aperture;
+    float focus_plane;
 };
 
 #endif //CAMERA_H

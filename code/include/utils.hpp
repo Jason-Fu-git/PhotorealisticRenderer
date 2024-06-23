@@ -25,6 +25,22 @@ inline double uniform01() {
 }
 
 /**
+ * Randomly choose a point in a circle
+ * @param radius radius of the circle
+ * @return a random point in the circle
+ */
+ inline std::pair<float, float> randomPointInCircle(float radius) {
+     //randomly choose a length
+     float r = uniform01() * radius;
+     //randomly choose an angle
+     float theta = uniform01() * 2 * M_PI;
+     //calculate the x and y
+     float x = r * std::cos(theta);
+     float y = r * std::sin(theta);
+     return std::make_pair(x, y);
+ }
+
+/**
  * clamp the data between min and max.
  * 1. if data > max, then return max
  * 2. if data < min, then return min
