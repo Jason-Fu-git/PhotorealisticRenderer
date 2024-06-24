@@ -32,6 +32,9 @@ public:
         _a = a;
         _b = b;
         _c = c;
+        u = 0;
+        v = 0;
+//        printf("Triangle created %f %f %f\n", a[0], a[1], a[2]);
     }
 
     bool intersect(const Ray &ray, Hit &hit, float tmin) override {
@@ -44,6 +47,7 @@ public:
         float det1 = Matrix3f(ray.getDirection().normalized(), E1, E2).determinant();
         if (det1 != 0) // valid solution
         {
+//            printf("det1 = %f\n", det1);
             float t = Matrix3f(S, E1, E2).determinant() / det1 / original_length;
             float beta = Matrix3f(ray.getDirection().normalized(), S, E2).determinant() / det1;
             float gamma = Matrix3f(ray.getDirection().normalized(), E1, S).determinant() / det1;
@@ -78,6 +82,11 @@ public:
 
 
     Vector3f normal;
+
+    // texture map
+    float u;
+    float v;
+
 protected:
     Vector3f _a;
     Vector3f _b;

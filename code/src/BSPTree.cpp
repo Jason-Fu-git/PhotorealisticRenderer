@@ -9,6 +9,7 @@
 #define TOLERANCE 0.01
 
 BSPTree::BSPTree(std::vector<Object3D *> &objects) {
+    size = 0;
     root = construct(objects, Ray::X_AXIS);
 }
 
@@ -33,6 +34,7 @@ BSPTree::Node *BSPTree::construct(std::vector<Object3D *> &objects, int axis) {
         leaf->objects = new Object3D *[n];
         for (int i = 0; i < n; i++) {
             leaf->objects[i] = objects[i];
+            size += 1;
         }
         return leaf;
     }
@@ -60,6 +62,7 @@ BSPTree::Node *BSPTree::construct(std::vector<Object3D *> &objects, int axis) {
         leaf->objects = new Object3D *[n];
         for (int i = 0; i < n; i++) {
             leaf->objects[i] = objects[i];
+            size++;
         }
         return leaf;
     }

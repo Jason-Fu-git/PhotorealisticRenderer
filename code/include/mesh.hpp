@@ -20,7 +20,7 @@ class Mesh : public Object3D {
 public:
     Mesh(const char *filename, Material *m);
 
-    Mesh(std::vector<Triangle*> &trigs, Material *m);
+    explicit Mesh(std::vector<Triangle*> &trigs);
 
     ~Mesh() override {
         for (auto obj: triangles) {

@@ -53,6 +53,10 @@ public:
         refractive_index = _refractive_index;
     }
 
+    void setDiffuseColor(const Vector3f &d_color) {
+        diffuseColor = d_color;
+    }
+
     virtual void setObject(Object3D *object3D) {
         object = object3D;
     }

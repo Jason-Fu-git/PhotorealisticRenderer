@@ -21,9 +21,10 @@
 #include "transform.hpp"
 #include "curve.hpp"
 #include "revsurface.hpp"
+#include "fast_obj.h"
 
 #define DegreesToRadians(x) ((M_PI * x) / 180.0f)
-#define BASIC_MATERIAL 0
+#define PHONG_MATERIAL 0
 #define BRDF_MATERIAL 1
 
 SceneParser::SceneParser(const char *filename) {
@@ -289,7 +290,7 @@ Material *SceneParser::parseMaterial() {
     float rfl_c = 0;
     float rfr_c = 0;
     float rfr_i = 0;
-    int materialType = BASIC_MATERIAL;
+    int materialType = PHONG_MATERIAL;
     int surfaceType = Material::DIFFUSE;
     getToken(token);
     assert (!strcmp(token, "{"));
@@ -322,7 +323,7 @@ Material *SceneParser::parseMaterial() {
     }
     assert(surfaceType == Material::DIFFUSE || surfaceType == Material::SPECULAR ||
            surfaceType == Material::TRANSPARENT);
-    if (materialType == BASIC_MATERIAL) {
+    if (materialType == PHONG_MATERIAL) {
         auto *answer = new PhongMaterial(diffuseColor, specularColor, shininess);
         answer->setReflectiveProperties(rfl_c);
         answer->setRefractiveProperties(rfr_c, rfr_i);
@@ -379,11 +380,28 @@ Group *SceneParser::parseGroup() {
     // simple, and essentially ignores any tree hierarchy)
     //
     char token[MAX_PARSER_TOKEN_LENGTH];
+    char filename[MAX_PARSER_TOKEN_LENGTH];
+
     getToken(token);
     assert (!strcmp(token, "{"));
 
-    // read in the number of objects
+    // use obj parser
     getToken(token);
+    if (!strcmp(token, "ObjMaterialType")) {
+        // get the material type
+        int materialType = readInt();
+        getToken(token);
+        assert(!strcmp(token, "ObjFile"));
+        // get the filename
+        getToken(filename);
+        getToken(token);
+        assert (!strcmp(token, "}"));
+        const char *ext = &filename[strlen(filename) - 4];
+        assert(!strcmp(ext, ".obj"));
+        return parseObj(filename, materialType);
+    }
+
+    // read in the number of objects
     assert (!strcmp(token, "numObjects"));
     int num_objects = readInt();
 
@@ -396,22 +414,27 @@ Group *SceneParser::parseGroup() {
         if (!strcmp(token, "MaterialIndex")) {
             // change the current material
             int index = readInt();
-            assert (index >= 0 && index <= getNumMaterials());
-            current_material = getMaterial(index);
-            if (auto phong_m = dynamic_cast<PhongMaterial *>(current_material)) {
-                current_material = new PhongMaterial(*phong_m);
-            } else if (auto brdf_m = dynamic_cast<BRDFMaterial *>(current_material)) {
-                current_material = new BRDFMaterial(*brdf_m);
-            } else {
-                printf("Unknown material type in parseObject: '%d'\n", index);
-                exit(-1);
+            if (index == -1)
+                current_material = nullptr;
+            else {
+                current_material = getMaterial(index);
+                if (auto phong_m = dynamic_cast<PhongMaterial *>(current_material)) {
+                    current_material = new PhongMaterial(*phong_m);
+                } else if (auto brdf_m = dynamic_cast<BRDFMaterial *>(current_material)) {
+                    current_material = new BRDFMaterial(*brdf_m);
+                } else {
+                    printf("Unknown material type in parseObject: '%d'\n", index);
+                    exit(-1);
+                }
             }
         } else {
             Object3D *object = parseObject(token);
             assert (object != nullptr);
             answer->addObject(count, object);
-            current_material->setObject(object);
-            materials_vec.push_back(current_material);
+            if (current_material != nullptr) {
+                current_material->setObject(object);
+                materials_vec.push_back(current_material);
+            }
             count++;
         }
     }
@@ -420,6 +443,131 @@ Group *SceneParser::parseGroup() {
 
     // return the group
     return answer;
+}
+
+Group *SceneParser::parseObj(const char *filename, int materialType) {
+    fastObjMesh *m = fast_obj_read(filename);
+    if (m == nullptr) {
+        fprintf(stderr, "Error reading %s\n", filename);
+        exit(-1);
+    }
+
+    // create the group
+    auto *answer = new Group(m->group_count);
+    printf("Reading %s: %d faces, %d groups\n", filename, m->face_count, m->group_count);
+
+
+    // parse textures
+    std::vector<Image *> imgs;
+    imgs.push_back(nullptr);
+    for (int ti = 1; ti < m->texture_count; ti++) {
+        assert(m->textures[ti].path != nullptr);
+        Image *texture;
+        std::string path = std::string(m->textures[ti].path);
+        if (hasEnding(path, ".tga")) {
+            texture = Image::LoadTGA(m->textures[ti].path);
+        } else if (hasEnding(path, ".ppm")) {
+            texture = Image::LoadPPM(m->textures[ti].path);
+        } else {
+            texture = nullptr;
+            std::cerr << "Unsupported texture format : must be one of .tga or .ppm" << std::endl;
+            exit(1);
+        }
+        imgs.push_back(texture);
+        printf("Texture %d: %s\n", ti, m->textures[ti].path);
+    }
+
+    // read the subgroups
+    for (int gi = 0; gi < m->group_count; gi++) {
+        auto grp = m->groups[gi];
+
+        // create the subgroup
+        printf("Group %d: %d faces\n", gi, grp.face_count);
+
+        // parse the faces
+        std::vector<Triangle *> triangles;
+        triangles.reserve(grp.face_count);
+
+        int idx = 0;
+        for (int fi = 0; fi < grp.face_count; fi++) {
+            assert(m->face_vertices[grp.face_offset + fi] == 3);
+
+            // parse the material
+            auto objMaterial = m->materials[m->face_materials[grp.face_offset + fi]];
+            Material *material;
+            if (materialType == PHONG_MATERIAL)
+                material = new PhongMaterial(Vector3f(objMaterial.Kd), Vector3f(objMaterial.Ks), 10);
+            else if (materialType == BRDF_MATERIAL)
+                material = new BRDFMaterial(Vector3f(objMaterial.Kd), 0, 0, 0, BRDFMaterial::DIFFUSE);
+            else{
+                fprintf(stderr, "Unknown material type\n");
+                exit(-1);
+            }
+
+            materials_vec.push_back(material);
+
+            // parse the vertices
+            auto *vertices = new Vector3f[3];
+            float tu = 0.0, tv = 0.0;
+            for (int vi = 0; vi < 3; vi++) {
+                auto mi = m->indices[grp.index_offset + idx];
+                assert(mi.p);
+                vertices[vi][0] = m->positions[3 * mi.p + 0];
+                vertices[vi][1] = m->positions[3 * mi.p + 1];
+                vertices[vi][2] = m->positions[3 * mi.p + 2];
+                if (mi.t) {
+                    tu += m->texcoords[2 * mi.t + 0];
+                    tv += m->texcoords[2 * mi.t + 1];
+                }
+                ++idx;
+            }
+
+            // create the triangle
+            auto *triangle = new Triangle(vertices[0], vertices[1], vertices[2], material);
+
+//            printf("Triangle\n");
+//            printf("  v0: %f, %f, %f\n", vertices[0][0], vertices[0][1], vertices[0][2]);
+//            printf("  v1: %f, %f, %f\n", vertices[1][0], vertices[1][1], vertices[1][2]);
+//            printf("  v2: %f, %f, %f\n", vertices[2][0], vertices[2][1], vertices[2][2]);
+//            fflush(stdout);
+
+            // calculate the normal
+            Vector3f normal = Vector3f::cross(vertices[1] - vertices[0], vertices[2] - vertices[0]).normalized();
+            triangle->normal = normal;
+
+            // calculate the texture coordinates
+            triangle->u = abs(tu / 3);
+            triangle->v = abs(tv / 3);
+            if (objMaterial.map_Kd) {
+                auto texture = imgs[objMaterial.map_Kd];
+                auto x = clamp(triangle->u * texture->Width(), 0, texture->Width() - 1);
+                auto y = clamp(texture->Height() - triangle->v * texture->Height(), 0, texture->Height() - 1);
+                auto Kd = texture->GetPixel(x, y);
+                material->setDiffuseColor(Kd);
+            }
+//            material->setDiffuseColor(Vector3f(0.5, 0.5, 0.5));
+
+            material->setObject(triangle);
+
+            // add the triangle to the vector
+            triangles.push_back(triangle);
+        }
+
+        // create a mesh
+        Mesh *mesh = new Mesh(triangles);
+        answer->addObject(mesh);
+    }
+
+    // release the memory
+    for (int ti = 1; ti < m->texture_count; ti++) {
+        delete imgs[ti];
+    }
+    fast_obj_destroy(m);
+
+    printf("Successfully parsed the obj file!\n");
+
+    return answer;
+
 }
 
 // ====================================================================

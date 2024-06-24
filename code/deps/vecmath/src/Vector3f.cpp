@@ -276,6 +276,12 @@ Vector3f Vector3f::cubicInterpolate( const Vector3f& p0, const Vector3f& p1, con
 	return Vector3f::lerp( p0p1_p1p2, p1p2_p2p3, t );
 }
 
+Vector3f::Vector3f(float *array) {
+    m_elements[0] = array[0];
+    m_elements[1] = array[1];
+    m_elements[2] = array[2];
+}
+
 Vector3f operator + ( const Vector3f& v0, const Vector3f& v1 )
 {
     return Vector3f( v0[0] + v1[0], v0[1] + v1[1], v0[2] + v1[2] );

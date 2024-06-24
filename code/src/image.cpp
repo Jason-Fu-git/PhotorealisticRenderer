@@ -142,6 +142,7 @@ void Image::SavePPM(const char *filename) const {
 
 Image *Image::LoadPPM(const char *filename) {
     assert(filename != NULL);
+    printf("Loading PPM file %s\n", filename);
     // must end in .ppm
     const char *ext = &filename[strlen(filename) - 4];
     assert(!strcmp(ext, ".ppm"));

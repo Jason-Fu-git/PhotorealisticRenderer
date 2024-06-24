@@ -18,6 +18,7 @@ SET(FINAL_PROJECT_SOURCES
         src/scene_parser.cpp
         src/material.cpp
         src/BSPTree.cpp
+        src/fast_obj.cpp
 )
 
 SET(FINAL_PROJECT_INCLUDES
@@ -41,6 +42,7 @@ SET(FINAL_PROJECT_INCLUDES
         include/boundingBox.hpp
         include/curve.hpp
         include/revsurface.hpp
+        include/fast_obj.h
 )
 
 SET(CMAKE_CXX_STANDARD 11)

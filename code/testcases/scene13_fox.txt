@@ -1,0 +1,63 @@
+
+PerspectiveCamera {
+    center 20 -15 9
+    direction -1.5 1.17 -0.2
+    up 0 0 1
+    angle 50
+    width 720
+    height 720
+}
+
+Lights {
+    numLights 2
+
+    SphereLight {
+      position 25 -18 13
+      color 500 500 500
+      radius 1.5
+    }
+
+    SphereLight {
+       position -50 10 25
+       color 500 500 500
+       radius 1.5
+    }
+}
+
+Background {
+    color 0.44705883 0.5254902 0.8156863
+}
+
+Materials {
+    numMaterials 1
+    Material {
+        materialType 1
+        surfaceType 0
+        diffuseColor 0 0 0
+        emissionColor 500 500 500
+    }
+
+}
+
+Group {
+    numObjects 3
+
+    MaterialIndex -1
+    Group {
+        ObjMaterialType 1
+        ObjFile mesh/low_poly_fox/77800.obj
+    }
+
+    MaterialIndex 0
+    Sphere {
+       center 25 -18 13
+       radius 1.5
+    }
+
+    MaterialIndex 0
+        Sphere {
+           center -50 10 25
+           radius 1.5
+        }
+}
+

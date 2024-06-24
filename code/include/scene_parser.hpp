@@ -84,6 +84,8 @@ private:
     Curve *parseBsplineCurve();
     RevSurface *parseRevSurface();
 
+    Group* parseObj(const char *filename, int materialType);
+
     int getToken(char token[MAX_PARSER_TOKEN_LENGTH]);
 
     Vector3f readVector3f();

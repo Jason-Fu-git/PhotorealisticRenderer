@@ -39,6 +39,10 @@ public:
         return inter;
     }
 
+    void addObject(Object3D *obj){
+        objects.push_back(obj);
+    }
+
     void addObject(int index, Object3D *obj) {
         objects.insert(objects.begin() + index, obj);
     }

@@ -66,6 +66,10 @@ public:
      */
     bool intersect(const Ray &r, Hit &h, float tmin, float tmax);
 
+    int getSize() {
+        return size;
+    }
+
 private:
     /**
      * Construct the BSP Tree recursively
@@ -78,6 +82,8 @@ private:
     bool intersect(Node *node, const Ray &r, Hit &h, float tmin, float tmax);
 
     Node *root;
+
+    int size;
 };
 
 #endif //FINALPROJECT_BSPTREE_HPP
