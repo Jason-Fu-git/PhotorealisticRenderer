@@ -26,7 +26,7 @@
 class Renderer {
 public:
     Renderer(SceneParser *parser, std::string output_path, int num_samples)
-            : parser(parser), outputFile(std::move(output_path)), samples(num_samples){}
+            : parser(parser), outputFile(std::move(output_path)), samples(num_samples) {}
 
     virtual Vector3f intersectColor(Group *group, Ray ray, std::vector<Light *> &lights, Vector3f backgroundColor,
                                     float weight, int depth) = 0;
@@ -43,7 +43,7 @@ public:
         }
         // Then loop over each pixel in the image, shooting a ray through that pixel .
         // Write the color at the intersection to that pixel in your output image.
-#pragma omp parallel for schedule(dynamic, 1)
+#pragma omp parallel for num_threads(16) schedule(dynamic, 1)
         for (int y = 0; y < camera->getHeight(); y++) {
             fprintf(stderr, "\rRendering (%d spp) %5.2f%%", samples * 4, 100. * y / (camera->getHeight() - 1));
             for (int x = 0; x < camera->getWidth(); x++) {
@@ -68,6 +68,16 @@ public:
                 }
                 image.SetPixel(x, camera->getHeight() - 1 - y, color);
             }
+
+            // save checkpoint
+            if (y % 100 == 0 && y > 0) {
+                Image checkpointImage(image);
+                auto checkPointFile = outputFile + ".checkpoint." + std::to_string(y) + ".bmp";
+                checkpointImage.SaveImage(checkPointFile.c_str());
+                printf("\nCheckpoint saved to %s\n", checkPointFile.c_str());
+            }
+
+
         }
 
         // 存储图片

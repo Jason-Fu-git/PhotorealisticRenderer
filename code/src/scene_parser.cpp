@@ -398,7 +398,7 @@ Group *SceneParser::parseGroup() {
         assert (!strcmp(token, "}"));
         const char *ext = &filename[strlen(filename) - 4];
         assert(!strcmp(ext, ".obj"));
-        return parseObj(filename, materialType);
+        return parseObjFile(filename, materialType);
     }
 
     // read in the number of objects
@@ -445,7 +445,7 @@ Group *SceneParser::parseGroup() {
     return answer;
 }
 
-Group *SceneParser::parseObj(const char *filename, int materialType) {
+Group *SceneParser::parseObjFile(const char *filename, int materialType) {
     fastObjMesh *m = fast_obj_read(filename);
     if (m == nullptr) {
         fprintf(stderr, "Error reading %s\n", filename);
@@ -468,6 +468,8 @@ Group *SceneParser::parseObj(const char *filename, int materialType) {
             texture = Image::LoadTGA(m->textures[ti].path);
         } else if (hasEnding(path, ".ppm")) {
             texture = Image::LoadPPM(m->textures[ti].path);
+        } else if (hasEnding(path, ".png")){
+            texture = Image::LoadPNG(m->textures[ti].path);
         } else {
             texture = nullptr;
             std::cerr << "Unsupported texture format : must be one of .tga or .ppm" << std::endl;
@@ -508,7 +510,9 @@ Group *SceneParser::parseObj(const char *filename, int materialType) {
 
             // parse the vertices
             auto *vertices = new Vector3f[3];
-            float tu = 0.0, tv = 0.0;
+            auto *us = new float[3];
+            auto *vs = new float[3];
+            us[0] = 100;
             for (int vi = 0; vi < 3; vi++) {
                 auto mi = m->indices[grp.index_offset + idx];
                 assert(mi.p);
@@ -516,8 +520,8 @@ Group *SceneParser::parseObj(const char *filename, int materialType) {
                 vertices[vi][1] = m->positions[3 * mi.p + 1];
                 vertices[vi][2] = m->positions[3 * mi.p + 2];
                 if (mi.t) {
-                    tu += m->texcoords[2 * mi.t + 0];
-                    tv += m->texcoords[2 * mi.t + 1];
+                    us[vi] = m->texcoords[2 * mi.t + 0];
+                    vs[vi] = m->texcoords[2 * mi.t + 1];
                 }
                 ++idx;
             }
@@ -536,14 +540,10 @@ Group *SceneParser::parseObj(const char *filename, int materialType) {
             triangle->normal = normal;
 
             // calculate the texture coordinates
-            triangle->u = abs(tu / 3);
-            triangle->v = abs(tv / 3);
             if (objMaterial.map_Kd) {
+                triangle->setTextureUV(us[0], vs[0], us[1], vs[1], us[2], vs[2]);
                 auto texture = imgs[objMaterial.map_Kd];
-                auto x = clamp(triangle->u * texture->Width(), 0, texture->Width() - 1);
-                auto y = clamp(texture->Height() - triangle->v * texture->Height(), 0, texture->Height() - 1);
-                auto Kd = texture->GetPixel(x, y);
-                material->setDiffuseColor(Kd);
+                material->setTexture(texture);
             }
 //            material->setDiffuseColor(Vector3f(0.5, 0.5, 0.5));
 
@@ -551,17 +551,20 @@ Group *SceneParser::parseObj(const char *filename, int materialType) {
 
             // add the triangle to the vector
             triangles.push_back(triangle);
+
+            // release the memory
+            delete[] us;
+            delete[] vs;
+            delete[] vertices;
         }
 
         // create a mesh
         Mesh *mesh = new Mesh(triangles);
         answer->addObject(mesh);
+
     }
 
     // release the memory
-    for (int ti = 1; ti < m->texture_count; ti++) {
-        delete imgs[ti];
-    }
     fast_obj_destroy(m);
 
     printf("Successfully parsed the obj file!\n");

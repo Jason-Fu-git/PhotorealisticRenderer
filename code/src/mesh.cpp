@@ -145,3 +145,23 @@ Mesh::Mesh(vector<Triangle*> &trigs) {
     printf("BSP Size %d\n", bspTree->getSize());
 }
 
+float Mesh::getLowerBound(int axis) {
+    if(axis == Ray::X_AXIS){
+        return bbox->x0;
+    }else if(axis == Ray::Y_AXIS){
+        return bbox->y0;
+    }else{
+        return bbox->z0;
+    }
+}
+
+float Mesh::getUpperBound(int axis) {
+    if(axis == Ray::X_AXIS){
+        return bbox->x1;
+    }else if(axis == Ray::Y_AXIS){
+        return bbox->y1;
+    }else{
+        return bbox->z1;
+    }
+}
+

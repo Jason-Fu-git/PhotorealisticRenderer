@@ -16,6 +16,10 @@
 
 
 class Mesh : public Object3D {
+public:
+    float getLowerBound(int axis) override;
+
+    float getUpperBound(int axis) override;
 
 public:
     Mesh(const char *filename, Material *m);

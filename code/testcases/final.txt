@@ -1,0 +1,121 @@
+
+PerspectiveCamera {
+    center -10 -6.2 2.7
+    direction 1 0.5 -0.2
+    up 0 0 1
+    angle 74
+    width 1920
+    height 1920
+}
+
+Lights {
+    numLights 4
+
+    SphereLight {
+      position 25 -18 13
+      color 500 500 500
+      radius 1.5
+    }
+
+    SphereLight {
+       position -50 10 25
+       color 500 500 500
+       radius 1.5
+    }
+
+    DirectionalLight {
+            direction 0 0 1
+            color 0.5 0.5 0.5
+    }
+
+    PointLight {
+        position -5.6 0 -2
+        color 0.5 0.5 0.5
+    }
+}
+
+Background {
+    color 0.44705883 0.5254902 0.8156863
+}
+
+Materials {
+    numMaterials 4
+    Material {
+        materialType 1
+        surfaceType 0
+        diffuseColor 0 0 0
+        emissionColor 500 500 500
+    }
+    Material {
+            materialType 1
+            surfaceType 1
+            diffuseColor 1 1 1
+            refractiveCoefficient 0.0
+            reflectiveCoefficient 1.0
+    }
+    Material {
+           materialType 1
+           surfaceType 2
+           diffuseColor 1 1 1
+           refractiveCoefficient 1.0
+           refractiveIndex 2.3
+           reflectiveCoefficient 0.0
+    }
+    Material {
+            materialType 1
+            surfaceType 0
+            diffuseColor 0 0 0
+            emissionColor 0.77254903 0.11372549 0.05490196
+        }
+
+}
+
+Group {
+    numObjects 7
+
+    MaterialIndex -1
+    Transform {
+        Scale 5 5 5
+        Group {
+            ObjMaterialType 1
+            ObjFile mesh/gate/78934.obj
+        }
+    }
+
+    MaterialIndex 0
+    Sphere {
+       center 25 -18 13
+       radius 1.5
+    }
+
+    MaterialIndex 0
+        Sphere {
+           center -50 10 25
+           radius 1.5
+        }
+
+    MaterialIndex 1
+          Sphere {
+               center -2 -5.5 2.3
+               radius 0.3
+    }
+
+    MaterialIndex 2
+          Sphere {
+               center -1.5 0.5 1.4
+               radius 0.7
+    }
+
+    MaterialIndex 3
+              Sphere {
+                   center 10.5 10.5 5.2
+                   radius 5
+        }
+
+    MaterialIndex 2
+              Sphere {
+                   center -5.8 -4.7 0.2
+                   radius 0.21
+        }
+}
+

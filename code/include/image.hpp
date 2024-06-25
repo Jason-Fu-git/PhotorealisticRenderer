@@ -18,10 +18,26 @@ public:
         width = w;
         height = h;
         data = new Vector3f[width * height];
+        a = new float[width * height];
+        for (int i = 0; i < width * height; i++) {
+            a[i] = 1;
+        }
+    }
+
+    Image(const Image &img) {
+        width = img.width;
+        height = img.height;
+        data = new Vector3f[width * height];
+        a = new float[width * height];
+        for (int i = 0; i < width * height; i++) {
+            data[i] = img.data[i];
+            a[i] = img.a[i];
+        }
     }
 
     ~Image() {
         delete[] data;
+        delete[] a;
     }
 
     int Width() const {
@@ -33,12 +49,25 @@ public:
     }
 
     const Vector3f &GetPixel(int x, int y) const {
-        if(x < 0 || x >= width || y < 0 || y >= height){
+        if (x == width) --x;
+        if (y == height) --y;
+        if (x < 0 || x >= width || y < 0 || y >= height) {
             printf("Warning: pixel (%d, %d) out of bounds (%d, %d)\n", x, y, width, height);
         }
         assert(x >= 0 && x < width);
         assert(y >= 0 && y < height);
         return data[y * width + x];
+    }
+
+    float GetAlpha(int x, int y) const {
+        if (x == width) --x;
+        if (y == height) --y;
+        if (x < 0 || x >= width || y < 0 || y >= height) {
+            printf("Warning: pixel (%d, %d) out of bounds (%d, %d)\n", x, y, width, height);
+        }
+        assert(x >= 0 && x < width);
+        assert(y >= 0 && y < height);
+        return a[y * width + x];
     }
 
     void SetAllPixels(const Vector3f &color) {
@@ -59,6 +88,9 @@ public:
 
     static Image *LoadTGA(const char *filename);
 
+    // Powered by https://github.com/lvandeve/lodepng
+    static Image *LoadPNG(const char *filename);
+
     void SaveTGA(const char *filename) const;
 
     int SaveBMP(const char *filename);
@@ -69,7 +101,8 @@ private:
 
     int width;
     int height;
-    Vector3f *data;
+    Vector3f *data; // RGB [0,1]
+    float *a;       // Alpha [0,1]
 
 };
 

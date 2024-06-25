@@ -19,6 +19,7 @@ SET(FINAL_PROJECT_SOURCES
         src/material.cpp
         src/BSPTree.cpp
         src/fast_obj.cpp
+        src/lodepng.cpp
 )
 
 SET(FINAL_PROJECT_INCLUDES
@@ -43,6 +44,7 @@ SET(FINAL_PROJECT_INCLUDES
         include/curve.hpp
         include/revsurface.hpp
         include/fast_obj.h
+        include/lodepng.h
 )
 
 SET(CMAKE_CXX_STANDARD 11)

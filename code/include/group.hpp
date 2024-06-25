@@ -3,8 +3,10 @@
 
 
 #include "object3d.hpp"
+#include "mesh.hpp"
 #include "ray.hpp"
 #include "hit.hpp"
+#include "BSPTree.hpp"
 #include <iostream>
 #include <vector>
 
@@ -39,7 +41,7 @@ public:
         return inter;
     }
 
-    void addObject(Object3D *obj){
+    void addObject(Object3D *obj) {
         objects.push_back(obj);
     }
 
@@ -47,7 +49,7 @@ public:
         objects.insert(objects.begin() + index, obj);
     }
 
-    Object3D* getObject(int index) {
+    Object3D *getObject(int index) {
         return objects[index];
     }
 
@@ -57,7 +59,6 @@ public:
 
 private:
     std::vector<Object3D *> objects;
-
 };
 
 #endif

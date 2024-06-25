@@ -50,6 +50,8 @@ void Material::setTexture(const char *filename) {
         texture = Image::LoadTGA(filename);
     } else if (hasEnding(path, ".ppm")) {
         texture = Image::LoadPPM(filename);
+    } else if (hasEnding(path, ".png")) {
+        texture = Image::LoadPNG(filename);
     } else {
         texture = nullptr;
         std::cerr << "Unsupported texture format : must be one of .tga or .ppm" << std::endl;

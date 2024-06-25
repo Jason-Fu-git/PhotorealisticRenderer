@@ -92,7 +92,7 @@ inline bool hasEnding (std::string const &fullString, std::string const &ending)
  * @param y
  * @return [0, y]
  */
-inline double mod(double x, double y) {
+inline float mod(float x, float y) {
     return fmod(fmod(x, y) + y, y);
 }
 

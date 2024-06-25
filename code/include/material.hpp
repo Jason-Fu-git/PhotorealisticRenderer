@@ -9,7 +9,10 @@
 
 #include "ray.hpp"
 #include "hit.hpp"
+#include "utils.hpp"
 #include "image.hpp"
+
+#define ALPHA_THRESHOLD 0.9
 
 class Object3D;
 
@@ -61,7 +64,20 @@ public:
         object = object3D;
     }
 
-    void setTexture(const char *filename) ;
+    void setTexture(const char *filename);
+
+    // Note : this constructor will use a public image, in order to save memory
+    void setTexture(Image *img) {
+        texture = img;
+    }
+
+    // Judge whether the tay transmits
+    // NOTE : u, v should be in [0, 1]!
+    bool isTransmit(float u, float v) {
+        assert(texture != nullptr);
+        auto alpha = texture->GetAlpha(std::floor(u * texture->Width()), std::floor(v * texture->Height()));
+        return alpha < ALPHA_THRESHOLD;
+    }
 
     virtual bool isEmitter() const {
         return false;
@@ -139,7 +155,7 @@ public:
 
     }
 
-    PhongMaterial(const PhongMaterial& m) : Material(m){
+    PhongMaterial(const PhongMaterial &m) : Material(m) {
         specularColor = m.specularColor;
         shininess = m.shininess;
     }
@@ -171,7 +187,7 @@ public:
         type = _type;
     }
 
-    BRDFMaterial(const BRDFMaterial& m) : Material(m){
+    BRDFMaterial(const BRDFMaterial &m) : Material(m) {
         emissionColor = m.emissionColor;
     }
 

@@ -9,6 +9,7 @@
 
 #include "image.hpp"
 #include "utils.hpp"
+#include "lodepng.h"
 
 // some helper functions for save & load
 
@@ -154,7 +155,7 @@ Image *Image::LoadPPM(const char *filename) {
     fgets(tmp, 100, file);
     assert (strstr(tmp, "P6"));
     fgets(tmp, 100, file);
-    if(tmp[0] == '#')
+    if (tmp[0] == '#')
         fgets(tmp, 100, file);
     else
         sscanf(tmp, "%d %d", &width, &height);
@@ -293,4 +294,33 @@ void Image::SaveImage(const char *filename) {
     } else {
         SaveTGA(filename);
     }
+}
+
+Image *Image::LoadPNG(const char *filename) {
+    std::vector<unsigned char> image; //the raw pixels
+    unsigned width, height;
+
+    //decode
+    unsigned error = lodepng::decode(image, width, height, filename);
+
+    //if there's an error, display it
+    if (error) {
+        fprintf(stderr, "decoder error %u: %s\n", error, lodepng_error_text(error));
+        exit(-1);
+    }
+
+    auto img = new Image(width, height);
+    for (int i = 0; i < width * height; i++) {
+        img->data[i] = Vector3f(
+                (int) image[i] / 255.0f,
+                (int) image[i + 1] / 255.0f,
+                (int) image[i + 2] / 255.0f
+        );
+        img->a[i] = (int) image[i + 3] / 255.0f;
+
+    }
+
+    printf("Successfully loaded PNG image %s\n", filename);
+
+    return img;
 }
