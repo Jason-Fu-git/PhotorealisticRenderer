@@ -16,7 +16,7 @@ Vector3f BRDFMaterial::Shade(const Ray &ray, const Hit &hit, const Vector3f &dir
         int x = std::max(0, std::min(tPoint.first, texture->Width() - 1));
         int y = std::max(0, std::min(tPoint.second, texture->Height() - 1));
         // 计算纹理颜色
-        return texture->GetPixel(texture->Width() - 1 - x, y);
+        return texture->GetPixel(x, y);
     }
     // 否则，直接返回漫反射颜色
     return diffuseColor;

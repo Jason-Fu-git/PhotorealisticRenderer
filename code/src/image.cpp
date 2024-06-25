@@ -309,15 +309,16 @@ Image *Image::LoadPNG(const char *filename) {
         exit(-1);
     }
 
-    auto img = new Image(width, height);
-    for (int i = 0; i < width * height; i++) {
-        img->data[i] = Vector3f(
-                (int) image[i] / 255.0f,
-                (int) image[i + 1] / 255.0f,
-                (int) image[i + 2] / 255.0f
-        );
-        img->a[i] = (int) image[i + 3] / 255.0f;
+    printf("%d\n", image.size());
 
+    auto img = new Image(width, height);
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++) {
+            int idx = (width * j + i) * 4;
+            img->SetPixel(i, height - 1 - j,
+                          {(int) image[idx] / 255.0f, (int) image[idx + 1] / 255.0f, (int) image[idx + 2] / 255.0f},
+                          (int) image[idx + 3] / 255.0f);
+        }
     }
 
     printf("Successfully loaded PNG image %s\n", filename);

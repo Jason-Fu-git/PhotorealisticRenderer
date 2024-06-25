@@ -76,10 +76,11 @@ public:
         }
     }
 
-    void SetPixel(int x, int y, const Vector3f &color) {
+    void SetPixel(int x, int y, const Vector3f &color, float alpha = 1.0f) {
         assert(x >= 0 && x < width);
         assert(y >= 0 && y < height);
         data[y * width + x] = color;
+        a[y * width + x] = alpha;
     }
 
     static Image *LoadPPM(const char *filename);

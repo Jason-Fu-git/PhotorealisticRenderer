@@ -9,28 +9,18 @@ PerspectiveCamera {
 }
 
 Lights {
-    numLights 4
+    numLights 2
 
     SphereLight {
       position 25 -18 13
-      color 500 500 500
-      radius 1.5
+      color 20 20 20
+      radius 5
     }
 
     SphereLight {
        position -50 10 25
-       color 500 500 500
-       radius 1.5
-    }
-
-    DirectionalLight {
-            direction 0 0 1
-            color 0.5 0.5 0.5
-    }
-
-    PointLight {
-        position -5.6 0 -2
-        color 0.5 0.5 0.5
+       color 20 20 20
+       radius 5
     }
 }
 
@@ -44,7 +34,7 @@ Materials {
         materialType 1
         surfaceType 0
         diffuseColor 0 0 0
-        emissionColor 500 500 500
+        emissionColor 20 20 20
     }
     Material {
             materialType 1
@@ -85,13 +75,13 @@ Group {
     MaterialIndex 0
     Sphere {
        center 25 -18 13
-       radius 1.5
+       radius 5
     }
 
     MaterialIndex 0
         Sphere {
            center -50 10 25
-           radius 1.5
+           radius 5
         }
 
     MaterialIndex 1

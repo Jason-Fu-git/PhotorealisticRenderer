@@ -126,14 +126,16 @@ public:
     float cu;
     float cv;
 
+    // last intersection's texture coordinate
+    float u;
+    float v;
+
 protected:
     Vector3f _a;
     Vector3f _b;
     Vector3f _c;
 
-    // last intersection's texture coordinate
-    float u;
-    float v;
+
 
 };
 
