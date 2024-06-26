@@ -1,6 +1,7 @@
-//
-// Created by Jason Fu on 24-5-30.
-//
+/**
+ * Bounding Box for an object.
+ * @author Jason Fu
+ */
 
 #ifndef FINALPROJECT_BOUNDINGBOX_HPP
 #define FINALPROJECT_BOUNDINGBOX_HPP

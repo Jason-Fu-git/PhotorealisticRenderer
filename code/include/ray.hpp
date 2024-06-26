@@ -1,8 +1,3 @@
-/**
- * @copybrief 清华大学计算机图形学课程提供框架
- *
- */
-
 #ifndef RAY_H
 #define RAY_H
 
@@ -13,8 +8,14 @@
 #include <Vector3f.h>
 
 
-// Ray class mostly copied from Peter Shirley and Keith Morley
-// Note : the direction of ray cannot be normalized, in case of transformation occurs!
+
+/**
+ *
+ * Ray class mostly copied from Peter Shirley and Keith Morley
+ * Note : the direction of ray cannot be normalized, in case of transformation occurs!
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 class Ray {
 public:
     enum Axis {
@@ -51,13 +52,10 @@ public:
         switch (axis) {
             case X_AXIS:
                 return (c - origin.x()) / direction.x();
-                break;
             case Y_AXIS:
                 return (c - origin.y()) / direction.y();
-                break;
             case Z_AXIS:
                 return (c - origin.z()) / direction.z();
-                break;
             default:
                 printf("Error: invalid axis");
                 exit(-1);

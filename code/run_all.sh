@@ -20,4 +20,4 @@ build/FinalProject monteCarlo testcases/scene11_transparentbunny.txt output/scen
 build/FinalProject whitted testcases/scene12_vase.txt output/scene12.bmp
 build/FinalProject monteCarlo testcases/scene13_fox.txt output/scene13.bmp 16
 build/FinalProject monteCarlo testcases/scene14_nee.txt output/scene14.bmp 16
-build/FinalProject monteCarlo testcases/scene15_depth.txt output/scene14.bmp 16
+build/FinalProject monteCarlo testcases/scene15_depth.txt output/scene15.bmp 16

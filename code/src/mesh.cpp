@@ -1,8 +1,3 @@
-/**
- * @copybrief 清华大学计算机图形学课程提供框架
- *
- */
-
 #include "mesh.hpp"
 #include <cfloat>
 #include <fstream>
@@ -10,23 +5,25 @@
 #include <algorithm>
 #include <sstream>
 
-
+/**
+ * Use boundingBox and BSPTree to fasten intersection.
+ * @author Jason Fu
+ *
+ */
 bool Mesh::intersect(const Ray &r, Hit &h, float tmin) {
-    // First intersect with the Bounding Box
     float t_min = tmin;
     float t_max = 1e38;
     if (!bbox->isIntersect(r, t_min, t_max)){
         return false;
     }
-    // Use BSP to fasten the intersection process
     bool result = bspTree->intersect(r, h, t_min, t_max);
-//    bool result = false;
-//    for (auto &triangle : triangles) {
-//        result |= triangle->intersect(r, h, tmin);
-//    }
     return result;
 }
 
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
     std::vector<Vector3f> v;
     std::vector<TriangleIndex> t;
@@ -122,6 +119,11 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
     printf("Mesh %s loaded\n", filename);
 }
 
+/**
+ * Copy constructor
+ * @author Jason Fu
+ *
+ */
 Mesh::Mesh(vector<Triangle*> &trigs) {
     triangles.assign(trigs.begin(), trigs.end());
     // create bounding box
@@ -145,6 +147,12 @@ Mesh::Mesh(vector<Triangle*> &trigs) {
     printf("BSP Size %d\n", bspTree->getSize());
 }
 
+/**
+ * Get the lower bound of coordinates along the given axis
+ * @param axis 0(x), 1(y), 2(z)
+ * @author Jason Fu
+ *
+ */
 float Mesh::getLowerBound(int axis) {
     if(axis == Ray::X_AXIS){
         return bbox->x0;
@@ -155,6 +163,12 @@ float Mesh::getLowerBound(int axis) {
     }
 }
 
+/**
+ * Get the upper bound of coordinates along the given axis
+ * @param axis 0(x), 1(y), 2(z)
+ * @author Jason Fu
+ *
+ */
 float Mesh::getUpperBound(int axis) {
     if(axis == Ray::X_AXIS){
         return bbox->x1;

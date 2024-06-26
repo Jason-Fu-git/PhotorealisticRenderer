@@ -1,4 +1,5 @@
-/*
+/**
+ * @copydetails
 LodePNG version 20230410
 
 Copyright (c) 2005-2023 Lode Vandevenne

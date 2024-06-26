@@ -19,6 +19,7 @@ class Object3D;
 /**
  * Base class for material.
  * @author Jason Fu
+ *
  */
 class Material {
 public:
@@ -77,12 +78,6 @@ public:
         assert(texture != nullptr);
         auto alpha = texture->GetAlpha(std::floor(u * texture->Width()), std::floor(v * texture->Height()));
         return alpha < ALPHA_THRESHOLD;
-
-//        u = clamp(abs(u), 0.0f, 1.0f);
-//        v = clamp(abs(v), 0.0f, 1.0f);
-//        auto pixel = texture->GetPixel(floor(u * texture->Width())
-//                , floor(v * texture->Height()));
-//        return pixel == Vector3f::ZERO || pixel == Vector3f::ONE;
 
     }
 

@@ -1,8 +1,3 @@
-/**
- * @copybrief 清华大学计算机图形学课程提供框架
- *
- */
-
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
@@ -27,6 +22,10 @@
 #define PHONG_MATERIAL 0
 #define BRDF_MATERIAL 1
 
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 SceneParser::SceneParser(const char *filename) {
 
     // initialize some reasonable default values
@@ -63,6 +62,10 @@ SceneParser::SceneParser(const char *filename) {
     }
 }
 
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 SceneParser::~SceneParser() {
 
     delete group;
@@ -86,6 +89,10 @@ SceneParser::~SceneParser() {
 // ====================================================================
 // ====================================================================
 
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 void SceneParser::parseFile() {
     //
     // at the top level, the scene can have a camera, 
@@ -114,6 +121,10 @@ void SceneParser::parseFile() {
 // ====================================================================
 // ====================================================================
 
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 void SceneParser::parsePerspectiveCamera() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     // read in the camera parameters
@@ -153,6 +164,10 @@ void SceneParser::parsePerspectiveCamera() {
     camera = new PerspectiveCamera(center, direction, up, width, height, angle_radians, aperture, focus);
 }
 
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 void SceneParser::parseBackground() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     // read in the background color
@@ -174,6 +189,10 @@ void SceneParser::parseBackground() {
 // ====================================================================
 // ====================================================================
 
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 void SceneParser::parseLights() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     getToken(token);
@@ -203,6 +222,10 @@ void SceneParser::parseLights() {
     assert (!strcmp(token, "}"));
 }
 
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 Light *SceneParser::parseDirectionalLight() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     getToken(token);
@@ -218,6 +241,10 @@ Light *SceneParser::parseDirectionalLight() {
     return new DirectionalLight(direction, color);
 }
 
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 Light *SceneParser::parsePointLight() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     getToken(token);
@@ -233,6 +260,10 @@ Light *SceneParser::parsePointLight() {
     return new PointLight(position, color);
 }
 
+/**
+ * @author Jason Fu
+ *
+ */
 Light *SceneParser::parseSphereLight() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     getToken(token);
@@ -253,6 +284,10 @@ Light *SceneParser::parseSphereLight() {
 // ====================================================================
 // ====================================================================
 
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 void SceneParser::parseMaterials() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     getToken(token);
@@ -281,6 +316,10 @@ void SceneParser::parseMaterials() {
 }
 
 
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 Material *SceneParser::parseMaterial() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     char filename[MAX_PARSER_TOKEN_LENGTH];
@@ -344,6 +383,10 @@ Material *SceneParser::parseMaterial() {
 // ====================================================================
 // ====================================================================
 
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 Object3D *SceneParser::parseObject(char token[MAX_PARSER_TOKEN_LENGTH]) {
     Object3D *answer = nullptr;
     if (!strcmp(token, "Group")) {
@@ -370,6 +413,10 @@ Object3D *SceneParser::parseObject(char token[MAX_PARSER_TOKEN_LENGTH]) {
 // ====================================================================
 // ====================================================================
 
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 Group *SceneParser::parseGroup() {
     //
     // each group starts with an integer that specifies
@@ -445,6 +492,11 @@ Group *SceneParser::parseGroup() {
     return answer;
 }
 
+/**
+ * Parse .obj file using fast_obj.h
+ * @author Jason Fu
+ *
+ */
 Group *SceneParser::parseObjFile(const char *filename, int materialType) {
     fastObjMesh *m = fast_obj_read(filename);
     if (m == nullptr) {
@@ -529,12 +581,6 @@ Group *SceneParser::parseObjFile(const char *filename, int materialType) {
             // create the triangle
             auto *triangle = new Triangle(vertices[0], vertices[1], vertices[2], material);
 
-//            printf("Triangle\n");
-//            printf("  v0: %f, %f, %f\n", vertices[0][0], vertices[0][1], vertices[0][2]);
-//            printf("  v1: %f, %f, %f\n", vertices[1][0], vertices[1][1], vertices[1][2]);
-//            printf("  v2: %f, %f, %f\n", vertices[2][0], vertices[2][1], vertices[2][2]);
-//            fflush(stdout);
-
             // calculate the normal
             Vector3f normal = Vector3f::cross(vertices[1] - vertices[0], vertices[2] - vertices[0]).normalized();
             triangle->normal = normal;
@@ -545,7 +591,6 @@ Group *SceneParser::parseObjFile(const char *filename, int materialType) {
                 auto texture = imgs[objMaterial.map_Kd];
                 material->setTexture(texture);
             }
-//            material->setDiffuseColor(Vector3f(0.5, 0.5, 0.5));
 
             material->setObject(triangle);
 
@@ -576,6 +621,10 @@ Group *SceneParser::parseObjFile(const char *filename, int materialType) {
 // ====================================================================
 // ====================================================================
 
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 Sphere *SceneParser::parseSphere() {
     float thetaOffset = 0.0, phiOffset = 0.0;
     char token[MAX_PARSER_TOKEN_LENGTH];
@@ -601,7 +650,10 @@ Sphere *SceneParser::parseSphere() {
     return new Sphere(center, radius, current_material, thetaOffset, phiOffset);
 }
 
-
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 Plane *SceneParser::parsePlane() {
     float scale = 1.0f;
     char token[MAX_PARSER_TOKEN_LENGTH];
@@ -623,7 +675,10 @@ Plane *SceneParser::parsePlane() {
     return new Plane(normal, offset, current_material, scale);
 }
 
-
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 Curve *SceneParser::parseBezierCurve() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     getToken(token);
@@ -648,7 +703,10 @@ Curve *SceneParser::parseBezierCurve() {
     return answer;
 }
 
-
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 Curve *SceneParser::parseBsplineCurve() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     getToken(token);
@@ -673,6 +731,10 @@ Curve *SceneParser::parseBsplineCurve() {
     return answer;
 }
 
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 RevSurface *SceneParser::parseRevSurface() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     getToken(token);
@@ -695,7 +757,10 @@ RevSurface *SceneParser::parseRevSurface() {
     return answer;
 }
 
-
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 Triangle *SceneParser::parseTriangle() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     getToken(token);
@@ -715,6 +780,10 @@ Triangle *SceneParser::parseTriangle() {
     return new Triangle(v0, v1, v2, current_material);
 }
 
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 Mesh *SceneParser::parseTriangleMesh() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     char filename[MAX_PARSER_TOKEN_LENGTH];
@@ -733,7 +802,10 @@ Mesh *SceneParser::parseTriangleMesh() {
     return answer;
 }
 
-
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 Transform *SceneParser::parseTransform() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     Matrix4f matrix = Matrix4f::identity();
@@ -800,6 +872,10 @@ Transform *SceneParser::parseTransform() {
 // ====================================================================
 // ====================================================================
 
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 int SceneParser::getToken(char token[MAX_PARSER_TOKEN_LENGTH]) {
     // for simplicity, tokens must be separated by whitespace
     assert (file != nullptr);
@@ -811,7 +887,10 @@ int SceneParser::getToken(char token[MAX_PARSER_TOKEN_LENGTH]) {
     return 1;
 }
 
-
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 Vector3f SceneParser::readVector3f() {
     float x, y, z;
     int count = fscanf(file, "%f %f %f", &x, &y, &z);
@@ -822,7 +901,10 @@ Vector3f SceneParser::readVector3f() {
     return Vector3f(x, y, z);
 }
 
-
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 float SceneParser::readFloat() {
     float answer;
     int count = fscanf(file, "%f", &answer);
@@ -833,7 +915,10 @@ float SceneParser::readFloat() {
     return answer;
 }
 
-
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
 int SceneParser::readInt() {
     int answer;
     int count = fscanf(file, "%d", &answer);

@@ -118,7 +118,9 @@ private:
 };
 
 /**
- * A sphere light
+ * Sphere light
+ * NOTE : CURRENTLY, NEE ONLY SUPPORTS SPHERE LIGHT. THIS MEANS IF YOU WANT TO USE NEE, YOU MUST
+ * EXPLICITLY DECLARE A SPHERE LIGHT IN THE SCENE CONFIGURATION FILE.
  * @author Jason FU
  *
  */
@@ -166,7 +168,6 @@ public:
                 if(hit.getT() > tmin){
                     return false;
                 }
-
                 // intersects
                 if (abs(radius * radius - Vector3f::dot(intersectionPoint - position, intersectionPoint - position)) <=
                     TOLERANCE * 10) {

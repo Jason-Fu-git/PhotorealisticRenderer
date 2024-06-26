@@ -38,26 +38,23 @@ public:
         bv = 100;
         cu = 100;
         cv = 100;
-//        printf("Triangle created %f %f %f\n", a[0], a[1], a[2]);
     }
 
     bool intersect(const Ray &ray, Hit &hit, float tmin) override {
         ++COUNT;
         float original_length = ray.getDirection().length();
-        // 采用重心坐标
+        // Using areal coordinates
         Vector3f E1 = _a - _b;
         Vector3f E2 = _a - _c;
         Vector3f S = _a - ray.getOrigin();
         float det1 = Matrix3f(ray.getDirection().normalized(), E1, E2).determinant();
         if (det1 != 0) // valid solution
         {
-//            printf("det1 = %f\n", det1);
             float t = Matrix3f(S, E1, E2).determinant() / det1 / original_length;
             float beta = Matrix3f(ray.getDirection().normalized(), S, E2).determinant() / det1;
             float gamma = Matrix3f(ray.getDirection().normalized(), E1, S).determinant() / det1;
 
             if (t > 0 && beta >= 0 && gamma >= 0 && beta + gamma <= 1) { // has intersection
-                // 注：内外情况分类未处理
                 if (hit.getT() > t && t >= tmin) {
 
                     // update texture data
@@ -72,7 +69,7 @@ public:
                             return false;
                     }
 
-                    // 判断交点在物体内还是物体外
+                    // Judge whether the intersection is inside the triangle
                     Vector3f _normal = normal;
                     bool isInside = false;
                     if (Vector3f::dot(normal, ray.getDirection()) > 0) {

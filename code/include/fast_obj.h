@@ -1,4 +1,5 @@
-/*
+/**
+ * @copydetails
  * fast_obj
  *
  * Version 1.3

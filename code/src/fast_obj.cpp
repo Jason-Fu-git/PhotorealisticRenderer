@@ -1,5 +1,6 @@
-/*
+/**
  *
+ * @copydetails
  * MIT License
  *
  * Copyright (c) 2018 Richard Knight

@@ -5,7 +5,6 @@
 
 #include "Matrix4f.h"
 
-#include <cassert>
 #include <cmath>
 #include <cstdio>
 #include <cstring>

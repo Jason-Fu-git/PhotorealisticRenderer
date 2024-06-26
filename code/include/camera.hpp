@@ -70,7 +70,6 @@ public:
         Vector3f ORw = center + horizontal * p.first - up * p.second;
         Matrix3f R = Matrix3f(horizontal, -up, direction);
         Vector3f dRw = (R * dRc).normalized();
-//        printf("dRw: %f, %f, %f, dRc: %f %f %f\n", dRw.x(), dRw.y(), dRw.z(), dRc.x(), dRc.y(), dRc.z());
         return Ray(ORw, dRw);
     }
 

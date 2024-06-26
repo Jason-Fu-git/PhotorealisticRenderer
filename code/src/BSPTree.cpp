@@ -1,6 +1,8 @@
-//
-// Created by Jason Fu on 24-5-30.
-//
+/**
+ * BSPTree class implementation
+ * @author Jason Fu
+ */
+
 #include "BSPTree.hpp"
 #include "ray.hpp"
 #include "object3d.hpp"

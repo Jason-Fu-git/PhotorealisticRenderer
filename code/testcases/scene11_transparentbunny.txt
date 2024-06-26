@@ -11,9 +11,9 @@ Lights {
     numLights 3
 
     SphereLight {
-         position 50 681.33 181.6
-         color 30 30 30
-         radius 600
+         position 50 65 81.6
+         color 500 500 500
+         radius 1.5
     }
 
     DirectionalLight {
@@ -72,7 +72,7 @@ Materials {
         materialType 1
         surfaceType 0
         diffuseColor 0 0 0
-        emissionColor 30 30 30
+        emissionColor 500 500 500
     }
 }
 
@@ -118,8 +118,8 @@ Group {
     }
     MaterialIndex 6
     Sphere {
-        center 50 681.33 181.6
-            radius 600
+        center 50 65 81.6
+            radius 1.5
         }
 }
 

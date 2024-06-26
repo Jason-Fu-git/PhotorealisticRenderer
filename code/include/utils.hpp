@@ -1,5 +1,7 @@
 /**
+ * Some random and numerical utility functions
  * @author Jason Fu
+ *
  */
 
 #ifndef UTILS_RANDOM_HPP

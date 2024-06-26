@@ -1,6 +1,8 @@
-//
-// Created by Jason Fu on 24-5-28.
-//
+/**
+ * Material Class Implementation
+ * @author Jason Fu
+ *
+ */
 #include "material.hpp"
 #include "object3d.hpp"
 #include "utils.hpp"

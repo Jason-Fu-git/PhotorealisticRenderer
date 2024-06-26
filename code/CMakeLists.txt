@@ -37,7 +37,7 @@ SET(FINAL_PROJECT_INCLUDES
         include/sphere.hpp
         include/transform.hpp
         include/triangle.hpp
-        include/render.hpp
+        include/renderer.hpp
         include/utils.hpp
         include/BSPTree.hpp
         include/boundingBox.hpp

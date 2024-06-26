@@ -1,7 +1,3 @@
-//
-// Created by Jason Fu on 24-6-14.
-//
-
 #ifndef FINALPROJECT_REVSURFACE_HPP
 #define FINALPROJECT_REVSURFACE_HPP
 
@@ -14,7 +10,7 @@
 #define GN_ERROR 1e-3
 #define GN_STEP 0.1
 
-// currently, revsurface does not support transparent material
+// Currently, revsurface does not support transparent material
 // NOTE : THIS CLASS ONLY SUPPORT SPECIFIC SCENES
 class RevSurface : public Object3D {
 
@@ -58,6 +54,11 @@ public:
         delete pCurve;
     }
 
+    /**
+     * Intersect with the revsurface using Newton's method
+     * @author Jason Fu
+     *
+     */
     bool intersect(const Ray &r, Hit &h, float tmin) override {
         // intersect with the bounding box
         float tmax = 1e38;
@@ -121,6 +122,7 @@ private:
      * @param r the ray
      * @param t the parameter on the xy-curve, the original number is t0.
      * @return whether the iteration converges.
+     * @author Jason Fu
      */
     bool Newton(const Ray &r, float &t) {
         int iter = 0;
@@ -145,6 +147,8 @@ private:
      * @param r
      * @param t
      * @return f(t), df(t)
+     * @author Jason Fu
+     * @acknowledgement PA2 习题课
      */
     inline void fdf(const Ray &r, float t, float &f, float &df) {
         Curve::CurvePoint cp;

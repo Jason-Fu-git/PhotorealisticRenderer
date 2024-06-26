@@ -1,15 +1,10 @@
 #include <cstdio>
 #include <cstdlib>
-#include <cmath>
 #include <iostream>
 #include <vector>
 
 #include "scene_parser.hpp"
-#include "image.hpp"
-#include "camera.hpp"
-#include "group.hpp"
-#include "light.hpp"
-#include "render.hpp"
+#include "renderer.hpp"
 #include "ctime"
 #include "chrono"
 #include "utils.hpp"
@@ -21,8 +16,8 @@ using namespace std;
 long long COUNT = 0;
 
 /**
+ * Program entry point.
  * @author Jason Fu
- *
  */
 int main(int argc, char *argv[]) {
     seed(time(nullptr));

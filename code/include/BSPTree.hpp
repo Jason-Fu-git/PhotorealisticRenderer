@@ -1,6 +1,8 @@
-//
-// Created by Jason Fu on 24-5-30.
-//
+/**
+ * BSP Tree Class Definition
+ * @author Jason Fu
+ *
+ */
 
 #ifndef FINALPROJECT_BSPTREE_HPP
 #define FINALPROJECT_BSPTREE_HPP

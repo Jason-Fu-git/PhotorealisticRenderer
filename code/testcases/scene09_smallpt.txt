@@ -7,16 +7,6 @@ PerspectiveCamera {
     height 720
 }
 
-Lights {
-    numLights 1
-
-    SphereLight {
-         position 50 681.33 81.6
-         color 30 30 30
-         radius 600
-    }
-}
-
 Background {
     color 0 0 0
 }

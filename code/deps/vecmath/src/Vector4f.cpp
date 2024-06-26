@@ -5,7 +5,6 @@
 
 #include <cmath>
 #include <cstdio>
-#include <cstdlib>
 
 #include "Vector4f.h"
 #include "Vector2f.h"

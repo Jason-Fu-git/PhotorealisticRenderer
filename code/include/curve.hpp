@@ -1,6 +1,6 @@
-//
-// Created by Jason Fu on 24-6-14.
-//
+/**
+ * Curve class, supports Bezier curve and B spline curve
+ */
 
 #ifndef FINALPROJECT_CURVE_HPP
 #define FINALPROJECT_CURVE_HPP

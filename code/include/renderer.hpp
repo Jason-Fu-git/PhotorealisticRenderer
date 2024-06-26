@@ -69,18 +69,19 @@ public:
                 image.SetPixel(x, camera->getHeight() - 1 - y, color);
             }
 
+
             // save checkpoint
-            if (y % 100 == 0 && y > 0) {
-                Image checkpointImage(image);
-                auto checkPointFile = outputFile + ".checkpoint." + std::to_string(y) + ".bmp";
-                checkpointImage.SaveImage(checkPointFile.c_str());
-                printf("\nCheckpoint saved to %s\n", checkPointFile.c_str());
-            }
+//            if (y % 100 == 0 && y > 0) {
+//                Image checkpointImage(image);
+//                auto checkPointFile = outputFile + ".checkpoint." + std::to_string(y) + ".bmp";
+//                checkpointImage.SaveImage(checkPointFile.c_str());
+//                printf("\nCheckpoint saved to %s\n", checkPointFile.c_str());
+//            }
 
 
         }
 
-        // 存储图片
+        // dump the image file
         image.SaveImage(outputFile.c_str());
         printf("\nDumped.\n");
     }
@@ -175,8 +176,9 @@ private:
 };
 
 /**
- * Monte-Carlo raytracing, cos-weighted sampling, RR termination
- * Based on smallpt
+ * Monte-Carlo raytracing, cos-weighted sampling, RR termination. Based on smallpt
+ * @acknowledgement : Kevin Beason
+ *
  */
 class MonteCarloRenderer : public Renderer {
 public:
