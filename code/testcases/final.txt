@@ -1,6 +1,6 @@
 
 PerspectiveCamera {
-    center -10 -6.2 2.7
+    center -10 -6.2 2.9
     direction 1 0.5 -0.2
     up 0 0 1
     angle 74
@@ -9,18 +9,23 @@ PerspectiveCamera {
 }
 
 Lights {
-    numLights 2
+    numLights 3
 
     SphereLight {
       position 25 -18 13
-      color 20 20 20
-      radius 5
+      color 300 300 300
+      radius 1.5
     }
 
     SphereLight {
        position -50 10 25
-       color 20 20 20
-       radius 5
+       color 300 300 300
+       radius 1.5
+    }
+
+    DirectionalLight {
+            direction 0 0 1
+            color 0.5 0.5 0.5
     }
 }
 
@@ -29,12 +34,12 @@ Background {
 }
 
 Materials {
-    numMaterials 4
+    numMaterials 5
     Material {
         materialType 1
         surfaceType 0
         diffuseColor 0 0 0
-        emissionColor 20 20 20
+        emissionColor 300 300 300
     }
     Material {
             materialType 1
@@ -48,7 +53,7 @@ Materials {
            surfaceType 2
            diffuseColor 1 1 1
            refractiveCoefficient 1.0
-           refractiveIndex 2.3
+           refractiveIndex 2.0
            reflectiveCoefficient 0.0
     }
     Material {
@@ -57,31 +62,38 @@ Materials {
             diffuseColor 0 0 0
             emissionColor 0.77254903 0.11372549 0.05490196
         }
-
+    Material {
+               materialType 1
+               surfaceType 2
+               diffuseColor 1 1 1
+               refractiveCoefficient 1.0
+               refractiveIndex 1.3
+               reflectiveCoefficient 0.0
+        }
 }
 
 Group {
     numObjects 7
 
     MaterialIndex -1
-    Transform {
-        Scale 5 5 5
-        Group {
-            ObjMaterialType 1
-            ObjFile mesh/gate/78934.obj
+        Transform {
+            Scale 5 5 5
+            Group {
+                ObjMaterialType 1
+                ObjFile mesh/gate/78934.obj
+            }
         }
-    }
 
     MaterialIndex 0
     Sphere {
        center 25 -18 13
-       radius 5
+       radius 1.5
     }
 
     MaterialIndex 0
         Sphere {
            center -50 10 25
-           radius 5
+           radius 1.5
         }
 
     MaterialIndex 1
@@ -102,7 +114,7 @@ Group {
                    radius 5
         }
 
-    MaterialIndex 2
+    MaterialIndex 4
               Sphere {
                    center -5.8 -4.7 0.2
                    radius 0.21

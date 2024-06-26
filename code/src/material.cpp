@@ -34,7 +34,7 @@ Vector3f PhongMaterial::Shade(const Ray &ray, const Hit &hit, const Vector3f &di
         int x = std::max(0, std::min(tPoint.first, texture->Width() - 1));
         int y = std::max(0, std::min(tPoint.second, texture->Height() - 1));
         // 计算纹理颜色
-        diffuse_color = texture->GetPixel(texture->Width() - 1 - x, y);
+        return texture->GetPixel(texture->Width() - 1 - x, y);
     }
     // 否则，按Phong模型着色
     Vector3f R = (2 * Vector3f::dot(dirToLight, hit.getNormal()) * hit.getNormal() - dirToLight).normalized();
