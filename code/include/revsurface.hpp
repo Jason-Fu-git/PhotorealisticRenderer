@@ -84,7 +84,6 @@ public:
                     finalP = cp;
                 }
             }
-            // G-N iteration
             if (tr > tmin) {
                 // calculate the point at t0
                 float t = tr;
@@ -118,7 +117,7 @@ public:
 
 private:
     /**
-     * Find the intersection point of the ray with the surface using G-N iteration.
+     * Find the intersection point of the ray with the surface using Newton iteration.
      * @param r the ray
      * @param t the parameter on the xy-curve, the original number is t0.
      * @return whether the iteration converges.

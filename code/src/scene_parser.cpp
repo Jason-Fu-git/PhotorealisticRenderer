@@ -21,6 +21,7 @@
 #define DegreesToRadians(x) ((M_PI * x) / 180.0f)
 #define PHONG_MATERIAL 0
 #define BRDF_MATERIAL 1
+#define COOKTORRANCE_MATERIAL 2
 
 /**
  * @copybrief 清华大学计算机图形学课程提供框架
@@ -303,7 +304,8 @@ void SceneParser::parseMaterials() {
         getToken(token);
         if (!strcmp(token, "Material") ||
             !strcmp(token, "PhongMaterial") ||
-            !strcmp(token, "BRDFMaterial")) {
+            !strcmp(token, "LambertianMaterial") ||
+            !strcmp(token, "CookTorranceMaterial")) {
             materials[count] = parseMaterial();
         } else {
             printf("Unknown token in parseMaterial: '%s'\n", token);
@@ -324,11 +326,14 @@ Material *SceneParser::parseMaterial() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     char filename[MAX_PARSER_TOKEN_LENGTH];
     filename[0] = 0;
-    Vector3f diffuseColor(1, 1, 1), specularColor(0, 0, 0), emissionColor(0, 0, 0);
+    Vector3f diffuseColor(1, 1, 1), specularColor(0, 0, 0), emissionColor(0, 0, 0), F0(0, 0, 0);
     float shininess = 0;
     float rfl_c = 0;
     float rfr_c = 0;
     float rfr_i = 0;
+    float m = 0;
+    float ks = 0;
+    float kd = 0;
     int materialType = PHONG_MATERIAL;
     int surfaceType = Material::DIFFUSE;
     getToken(token);
@@ -355,13 +360,21 @@ Material *SceneParser::parseMaterial() {
             materialType = readInt();
         } else if (strcmp(token, "surfaceType") == 0) {
             surfaceType = readInt();
+        } else if (strcmp(token, "roughness") == 0) {
+            m = readFloat();
+        } else if (strcmp(token, "F0") == 0) {
+            F0 = readVector3f();
+        } else if (strcmp(token, "ks") == 0) {
+            ks = readFloat();
+        } else if (strcmp(token, "kd") == 0) {
+            kd = readFloat();
         } else {
             assert (!strcmp(token, "}"));
             break;
         }
     }
     assert(surfaceType == Material::DIFFUSE || surfaceType == Material::SPECULAR ||
-           surfaceType == Material::TRANSPARENT);
+           surfaceType == Material::TRANSPARENT || surfaceType == Material::GLOSSY);
     if (materialType == PHONG_MATERIAL) {
         auto *answer = new PhongMaterial(diffuseColor, specularColor, shininess);
         answer->setReflectiveProperties(rfl_c);
@@ -370,7 +383,12 @@ Material *SceneParser::parseMaterial() {
             answer->setTexture(filename);
         return answer;
     } else if (materialType == BRDF_MATERIAL) {
-        auto *answer = new BRDFMaterial(diffuseColor, rfr_c, rfl_c, rfr_i, surfaceType, emissionColor);
+        auto *answer = new LambertianMaterial(diffuseColor, rfr_c, rfl_c, rfr_i, surfaceType, emissionColor);
+        if (filename[0])
+            answer->setTexture(filename);
+        return answer;
+    } else if (materialType == COOKTORRANCE_MATERIAL) {
+        auto *answer = new CookTorranceMaterial(diffuseColor, ks, kd, m, F0);
         if (filename[0])
             answer->setTexture(filename);
         return answer;
@@ -379,6 +397,8 @@ Material *SceneParser::parseMaterial() {
         exit(0);
     }
 }
+
+
 
 // ====================================================================
 // ====================================================================
@@ -467,8 +487,10 @@ Group *SceneParser::parseGroup() {
                 current_material = getMaterial(index);
                 if (auto phong_m = dynamic_cast<PhongMaterial *>(current_material)) {
                     current_material = new PhongMaterial(*phong_m);
-                } else if (auto brdf_m = dynamic_cast<BRDFMaterial *>(current_material)) {
-                    current_material = new BRDFMaterial(*brdf_m);
+                } else if (auto l_m = dynamic_cast<LambertianMaterial *>(current_material)) {
+                    current_material = new LambertianMaterial(*l_m);
+                } else if (auto cook_m = dynamic_cast<CookTorranceMaterial *>(current_material)) {
+                    current_material = new CookTorranceMaterial(*cook_m);
                 } else {
                     printf("Unknown material type in parseObject: '%d'\n", index);
                     exit(-1);
@@ -520,7 +542,7 @@ Group *SceneParser::parseObjFile(const char *filename, int materialType) {
             texture = Image::LoadTGA(m->textures[ti].path);
         } else if (hasEnding(path, ".ppm")) {
             texture = Image::LoadPPM(m->textures[ti].path);
-        } else if (hasEnding(path, ".png")){
+        } else if (hasEnding(path, ".png")) {
             texture = Image::LoadPNG(m->textures[ti].path);
         } else {
             texture = nullptr;
@@ -552,8 +574,8 @@ Group *SceneParser::parseObjFile(const char *filename, int materialType) {
             if (materialType == PHONG_MATERIAL)
                 material = new PhongMaterial(Vector3f(objMaterial.Kd), Vector3f(objMaterial.Ks), 10);
             else if (materialType == BRDF_MATERIAL)
-                material = new BRDFMaterial(Vector3f(objMaterial.Kd), 0, 0, 0, BRDFMaterial::DIFFUSE);
-            else{
+                material = new LambertianMaterial(Vector3f(objMaterial.Kd), 0, 0, 0, LambertianMaterial::DIFFUSE);
+            else {
                 fprintf(stderr, "Unknown material type\n");
                 exit(-1);
             }

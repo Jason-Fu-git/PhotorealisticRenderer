@@ -56,12 +56,14 @@ public:
         // angle is in radian.
         aperture = _aperture;
         focus_plane = _focus_plane;
+        // unit num pixels in camera space
         fx = imgW / (2.0f * std::tan(angle / 2.0f) * focus_plane);
         fy = imgH / (2.0f * std::tan(angle / 2.0f) * focus_plane);
         printf("fx: %f, fy: %f, aperture: %f, focus_plane: %f\n", fx, fy, aperture, focus_plane);
     }
 
     Ray generateRay(const Vector2f &point) override {
+        // randomly generate a ray in the aperture, while leave the focus point unchanged
         auto p = randomPointInCircle(aperture);
         Vector3f focusPoint = Vector3f((point.x() - width / 2.0f) / fx, (point.y() - height / 2.0f) / fy,  focus_plane);
         Vector3f ORc = Vector3f(p.first, p.second, 0);

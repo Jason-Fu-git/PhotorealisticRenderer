@@ -219,11 +219,10 @@ public:
             Vector3f u = (Vector3f::cross((std::fabs(w.x()) > 0.1 ? Vector3f(0, 1, 0) : Vector3f(1, 0, 0)),
                                           w)).normalized();
             Vector3f v = Vector3f::cross(w, u).normalized();
-            // 生成漫反射曲线
+            // 生成漫反射光线
             Vector3f dir = (u * std::cos(r1) * r2s + v * std::sin(r1) * r2s + w * std::sqrt(1 - r2)).normalized();
             Ray rfl_ray = Ray(ray.pointAtParameter(hit.getT() - DISTURBANCE), dir);
             // 对光源采样（NEE）
-            // NOTE : 本算法对面光源的支持度较好，最好不要使用点光源或方向光源。
             Vector3f nee_color = Vector3f::ZERO;
             for (Light *light: lights) {
                 Vector3f ldir, lc;
@@ -237,6 +236,28 @@ public:
             // 递归
             final_color = e_color +
                           color * (nee_color + intersectColor(group, rfl_ray, lights, backgroundColor, weight, depth));
+        } else if (type == Material::GLOSSY) { // glossy 材质
+            auto cook_material = dynamic_cast<CookTorranceMaterial *>(material);
+            assert(cook_material != nullptr);
+
+            const Vector3f &N = hit.getNormal();
+            Vector3f V = -ray.getDirection().normalized();
+
+            // 对H采样
+            Vector3f H = cook_material->sampleGGXHemisphere(N);
+
+            // 计算出射光线L
+            Vector3f L = (2.0F * Vector3f::dot(V, H) * H - V).normalized();
+
+            // 计算出射光线L是否被遮挡
+            if (Vector3f::dot(L, N) > 0.0f) {
+                Ray glossy_ray = Ray(ray.pointAtParameter(hit.getT() - DISTURBANCE), L);
+                final_color = e_color + cook_material->CookTorranceBRDF(L, V, N) *
+                                        intersectColor(group, glossy_ray, lights, backgroundColor, weight, depth);
+            } else {
+                final_color = e_color;
+            }
+
         } else if (type == Material::SPECULAR) { // 镜面反射
             // 生成反射光线
             Ray *rfl_ray = reflect(ray, hit.getNormal(), ray.pointAtParameter(hit.getT() - DISTURBANCE));

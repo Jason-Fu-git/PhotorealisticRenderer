@@ -7,7 +7,7 @@
 #include "object3d.hpp"
 #include "utils.hpp"
 
-Vector3f BRDFMaterial::Shade(const Ray &ray, const Hit &hit, const Vector3f &dirToLight, const Vector3f &color) {
+Vector3f LambertianMaterial::Shade(const Ray &ray, const Hit &hit, const Vector3f &dirToLight, const Vector3f &color) {
     // 如果具有材质，则计算映射
     if (texture != nullptr) {
         // 子物体不能为空
@@ -58,4 +58,22 @@ void Material::setTexture(const char *filename) {
         texture = nullptr;
         std::cerr << "Unsupported texture format : must be one of .tga or .ppm" << std::endl;
     }
+}
+
+Vector3f
+CookTorranceMaterial::Shade(const Ray &ray, const Hit &hit, const Vector3f &dirToLight, const Vector3f &lightColor) {
+    // 如果具有材质，则计算映射
+    if (texture != nullptr) {
+        // 子物体不能为空
+        assert(object != nullptr);
+        // 计算纹理映射
+        auto oPoint = ray.pointAtParameter(hit.getT());
+        auto tPoint = object->textureMap(oPoint.x(), oPoint.y(), oPoint.z(), texture->Width(), texture->Height());
+        int x = std::max(0, std::min(tPoint.first, texture->Width() - 1));
+        int y = std::max(0, std::min(tPoint.second, texture->Height() - 1));
+        // 计算纹理颜色
+        return texture->GetPixel(x, y);
+    }
+    // 否则，直接返回漫反射颜色
+    return diffuseColor;
 }

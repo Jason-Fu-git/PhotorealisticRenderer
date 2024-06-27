@@ -42,6 +42,24 @@ inline double uniform01() {
      return std::make_pair(x, y);
  }
 
+ /**
+  * Randomly choose a point in a sphere
+  * @param radius radius of the sphere
+  * @return a random point in the sphere
+  */
+ inline Vector3f randomPointInSphere(float radius) {
+     // randomly choose two angles
+     float theta = uniform01() * 2 * M_PI;
+     float phi = uniform01() * M_PI;
+     // randomly choose a length
+     float r = uniform01() * radius;
+     // calculate the x, y, z
+     float x = r * std::sin(phi) * std::cos(theta);
+     float y = r * std::sin(phi) * std::sin(theta);
+     float z = r * std::cos(phi);
+     return {x, y, z};
+ }
+
 /**
  * clamp the data between min and max.
  * 1. if data > max, then return max
