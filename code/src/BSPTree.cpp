@@ -7,8 +7,9 @@
 #include "ray.hpp"
 #include "object3d.hpp"
 #include <algorithm>
+#include <cmath>
 
-#define TOLERANCE 0.01
+#define TOLERANCE 0.0001
 
 BSPTree::BSPTree(std::vector<Object3D *> &objects) {
     size = 0;
@@ -90,6 +91,7 @@ bool BSPTree::intersect(BSPTree::Node *node, const Ray &r, Hit &h, float tmin, f
         }
         // non-leaf node, first calculate distance
         float t = r.parameterAtPoint(node->split, node->axis);
+
         // then judge the near and far side
         Node *near = node->lc, *far = node->rc;
         if (node->axis == Ray::X_AXIS && r.getOrigin()[Ray::X_AXIS] > node->split) {
@@ -104,7 +106,11 @@ bool BSPTree::intersect(BSPTree::Node *node, const Ray &r, Hit &h, float tmin, f
         }
 
         // finally calculate intersection
-        if (t > tmax + TOLERANCE || t < -TOLERANCE)
+        if (t >= -TOLERANCE && t <= TOLERANCE) {
+            // the origin almost lies in the split plane
+            isIntersect |= intersect(near, r, h, tmin, tmax);
+            isIntersect |= intersect(far, r, h, tmin, tmax);
+        } else if (t > tmax + TOLERANCE || t < -TOLERANCE)
             isIntersect |= intersect(near, r, h, tmin, tmax);
         else if (t < tmin - TOLERANCE)
             isIntersect |= intersect(far, r, h, tmin, tmax);
@@ -114,6 +120,7 @@ bool BSPTree::intersect(BSPTree::Node *node, const Ray &r, Hit &h, float tmin, f
             isIntersect |= intersect(far, r, h, t, tmax);
         }
     }
+
     return isIntersect;
 }
 
