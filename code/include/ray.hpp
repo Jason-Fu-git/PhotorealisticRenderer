@@ -8,7 +8,6 @@
 #include <Vector3f.h>
 
 
-
 /**
  *
  * Ray class mostly copied from Peter Shirley and Keith Morley

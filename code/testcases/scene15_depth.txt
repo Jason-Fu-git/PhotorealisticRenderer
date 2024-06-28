@@ -9,28 +9,12 @@ PerspectiveCamera {
     focus 250
 }
 
-Lights {
-    numLights 2
-
-    SphereLight {
-         position 50 65 81.6
-         color 500 500 500
-         radius 1.5
-    }
-
-    SphereLight {
-             position 50 65 200
-             color 500 500 500
-             radius 1.5
-        }
-}
-
 Background {
     color 0 0 0
 }
 
 Materials {
-    numMaterials 8
+    numMaterials 7
     Material {
         materialType 1
         surfaceType 0
@@ -70,18 +54,12 @@ Materials {
         materialType 1
         surfaceType 0
         diffuseColor 0 0 0
-        emissionColor 500 500 500
+        emissionColor 10 10 10
     }
-    Material {
-            materialType 1
-            surfaceType 0
-            diffuseColor 0 0 0
-            emissionColor 30 30 30
-        }
 }
 
 Group {
-    numObjects 10
+    numObjects 9
     MaterialIndex 0
     Plane {
         normal 1 0 0
@@ -129,13 +107,8 @@ Group {
           }
         }
     MaterialIndex 6
-    Sphere {
-        center 50 65 81.6
-            radius 1.5
-        }
-    MaterialIndex 6
         Sphere {
-            center 50 65 200
-                radius 1.5
-            }
+                center 50 699.33 81.6
+                    radius 600
+                }
 }

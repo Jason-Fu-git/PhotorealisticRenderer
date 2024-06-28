@@ -220,7 +220,12 @@ protected:
     Vector3f emissionColor;
 };
 
-
+/**
+ * Cook Torrance Model for Glossy Material
+ * @author Jason Fu
+ * @acknowledgement BRDF章节PPT
+ *
+ */
 class CookTorranceMaterial : public Material {
 public:
     explicit CookTorranceMaterial(const Vector3f& d_color, float s, float d, float m, const Vector3f& F0)

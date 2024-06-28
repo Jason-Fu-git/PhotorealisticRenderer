@@ -38,6 +38,9 @@ public:
         bv = 100;
         cu = 100;
         cv = 100;
+        _an = Vector3f::ZERO;
+        _bn = Vector3f::ZERO;
+        _cn = Vector3f::ZERO;
     }
 
     bool intersect(const Ray &ray, Hit &hit, float tmin) override {
@@ -57,9 +60,10 @@ public:
             if (t > 0 && beta >= 0 && gamma >= 0 && beta + gamma <= 1) { // has intersection
                 if (hit.getT() > t && t >= tmin) {
 
+                    float alpha = 1 - beta - gamma;
+
                     // update texture data
                     if (au != 100) {
-                        float alpha = 1 - beta - gamma;
                         u = mod(alpha * au + beta * bu + gamma * cu, 1);
                         v = mod(alpha * av + beta * bv + gamma * cv, 1);
 
@@ -72,6 +76,12 @@ public:
                     // Judge whether the intersection is inside the triangle
                     Vector3f _normal = normal;
                     bool isInside = false;
+
+                    // if vertex normal is specified, use normal interpolation
+                    if (_an != Vector3f::ZERO) {
+                        _normal = (_an * alpha + _bn * beta + _cn * gamma).normalized();
+                    }
+
                     if (Vector3f::dot(normal, ray.getDirection()) > 0) {
                         _normal = -normal;
                         isInside = true;
@@ -93,6 +103,12 @@ public:
         bv = _bv;
         cu = _cu;
         cv = _cv;
+    }
+
+    void setVertexNormals(const Vector3f &an, const Vector3f &bn, const Vector3f &cn) {
+        _an = an.normalized();
+        _bn = bn.normalized();
+        _cn = cn.normalized();
     }
 
     pair<int, int>
@@ -132,6 +148,9 @@ protected:
     Vector3f _b;
     Vector3f _c;
 
+    Vector3f _an;
+    Vector3f _bn;
+    Vector3f _cn;
 
 
 };

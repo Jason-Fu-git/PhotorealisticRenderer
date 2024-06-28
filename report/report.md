@@ -2,9 +2,25 @@
 
 付甲申 2022012206
 
+
+
+## 渲染结果
+
+场景共`116,198`个面片，分辨率`1920*1920`，渲染时间约`7`小时。(实验所用CPU：`12th Gen Intel(R) Core(TM) i7-12700H   2.30 GHz 	20 Threads`)
+
+![0_final](./assets/0_final.bmp)
+
+场景文件来自 [3D Models Free Download - Open3dModel.com](https://open3dmodel.com/)
+
+
+
 ## 基础功能实现
 
-实现了Whitted-style光线追踪，支持反射、折射和阴影。基于`smallpt`实现了路径追踪，支持面光源，漫反射，理想反射，折射，glossy材质等。下图展示了使用`NEE`与未使用`NEE`的收敛速度对比，可以明显看出`NEE`对收敛的加速作用。
+实现了Whitted-style光线追踪，支持反射、折射和阴影。基于`smallpt`实现了路径追踪，支持面光源，漫反射，理想反射，折射，glossy材质等。并且针对方向光源、点光源、球面光源做了`NEE`。
+
+### 效果对比
+
+下图展示了使用`NEE`与未使用`NEE`的收敛速度对比，可以明显看出`NEE`对收敛的加速作用。
 
 <div align="center">     
     <img src="./assets/1_no_nee.bmp" alt="1_no_nee" style="zoom:33%;" style="margin-right: 50px;"/>
@@ -14,10 +30,11 @@
 <div align='center'>
     左图未使用NEE，采样数为100；右图使用NEE，采样数为16
 </div>
-
-### 代码逻辑
+### 具体逻辑
 
 #### `Whitted-style` 渲染器逻辑
+
+基本参照课堂内容实现，代码中有详尽的注释。
 
 ```c++
 /**
@@ -102,6 +119,8 @@ private:
 ```
 
 #### `Monte-Carlo` 渲染器逻辑
+
+基于`smallpt`实现，代码中有详尽的注释。
 
 ```c++
 /**
@@ -233,7 +252,7 @@ public:
 
 #### `NEE` 采样逻辑
 
-这里只展示对于球面光源的采样代码
+这里只展示对于球面光源的采样代码。
 
 ```c++
 // NOTE : the color it returns should be multiplied by <dir, normal> externally
@@ -267,11 +286,140 @@ public:
     }
 ```
 
+#### glossy材质逻辑
+
+验收的时候没写glossy材质，所以这里把图给补上。
+
+<img src="./assets/6_glossy.bmp" alt="6_glossy" style="zoom:33%;" />
+
+glossy材质基于`Cook Torrance Model`实现，分布选用`GGX`，菲涅尔项和几何衰减项均使用`Schlick`法近似。这里展示该模型的代码：
+
+```c++
+/**
+ * Cook Torrance Model for Glossy Material
+ * @author Jason Fu
+ * @acknowledgement BRDF章节PPT
+ * 
+ */
+class CookTorranceMaterial : public Material {
+public:
+    explicit CookTorranceMaterial(const Vector3f& d_color, float s, float d, float m, const Vector3f& F0)
+            : Material(d_color, 0.0, 0.0, 0.0) {
+        this->m = m;
+        this->s = s;
+        this->d = d;
+        this->F0 = F0;
+        this->type = MaterialType::GLOSSY;
+    }
+
+    CookTorranceMaterial(const CookTorranceMaterial &m) : Material(m) {
+        this->m = m.m;
+        this->s = m.s;
+        this->d = m.d;
+        this->F0 = m.F0;
+        this->type = MaterialType::GLOSSY;
+    }
+
+    Vector3f Shade(const Ray &ray, const Hit &hit, const Vector3f &dirToLight, const Vector3f &lightColor) override;
+
+    Vector3f CookTorranceBRDF(const Vector3f &L, const Vector3f &V, const Vector3f &N) const {
+        // half vector
+        Vector3f H = (L + V).normalized();
+        // Fresnel
+        Vector3f F = fresnelSchlick(H, V);
+        // distribution
+        float D = distributionGGX(N, H);
+        // geometry
+        float G = geometrySmith(N, V, L);
+
+        auto specular = (D * F * G) / (4 *
+                    std::max(Vector3f::dot(N, V), 0.0f) *
+                    std::max(Vector3f::dot(N, L), 0.0f) + 0.001f
+                );
+
+        return (d * diffuseColor + s * specular);
+    }
+
+
+    /**
+     * Calculate the Fresnel Reflection Coefficient
+     */
+    Vector3f fresnelSchlick(const Vector3f &H, const Vector3f &V) const{
+        float hv = std::max(Vector3f::dot(H, V), 0.0f);
+        return F0 + (1 - F0) * pow(1 - hv, 5);
+    }
+
+    /**
+     * GGX Distribution
+     */
+    float distributionGGX(const Vector3f &N, const Vector3f &H) const {
+        float a2 = m * m;
+        float nh = std::max(Vector3f::dot(N, H), 0.0f);
+        float b = nh * nh * (a2 - 1) + 1;
+        return a2 / (M_PI * b * b);
+    }
+
+    /**
+     * Geometry Smith Method
+     */
+    float geometrySmith(const Vector3f &N, const Vector3f &V, const Vector3f &L) const {
+        return geometrySchlickGGX(N, V) * geometrySchlickGGX(N, L);
+    }
+
+    /**
+     * Geometry Schlick-GGX Method
+     */
+    float geometrySchlickGGX(const Vector3f &N, const Vector3f &V) const {
+        float k = (m + 1) * (m + 1) / 8;
+        float nv = std::max(Vector3f::dot(N, V), 0.0f);
+        return nv / (nv * (1 - k) + k);
+    }
+
+    /**
+     * Sampling in the GGX Hemisphere
+     */
+    Vector3f sampleGGXHemisphere(const Vector3f &N) {
+        float r1 = uniform01();
+        float r2 = uniform01();
+
+        float a = m * m;
+        float phi = 2 * M_PI * r1;
+        float cosTheta = std::sqrt((1.0 - r2) / (1.0 + (a * a - 1.0) * r2));
+        float sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
+
+        // Convert to Cartesian coordinates
+        Vector3f H;
+        H.x() = sinTheta * std::cos(phi);
+        H.y() = sinTheta * std::sin(phi);
+        H.z() = cosTheta;
+
+        // Transform to world space
+        Vector3f up = (std::fabs(N.z()) < 0.999) ? 
+            Vector3f(0.0, 0.0, 1.0) : Vector3f(1.0, 0.0, 0.0);
+        Vector3f tangentX = Vector3f::cross(up, N).normalized();
+        Vector3f tangentY = Vector3f::cross(N, tangentX);
+
+        return (tangentX * H.x() + tangentY * H.y() + N * H.z()).normalized();
+    }
+
+
+protected:
+    float s;  // specular coefficient
+    float d;  // diffuse coefficient
+    float m;  // roughness
+    Vector3f F0; // Fresnel coefficient
+
+
+};
+```
+
+
+
 
 
 ## 附加功能实现
 
-### 抗锯齿 （低）
+### 抗锯齿 
 
 抗锯齿方法使用SSAA（Supersampling Anti-Aliasing），对每一个像素采样2*2的子像素，最后取平均。受`smallpt`启发，采样时使用`tent filter`，即基于函数
 $$
@@ -307,7 +455,7 @@ for (int sx = 0; sx < 2; sx++) {
 
 
 
-### 纹理贴图 （低）
+### 纹理贴图 
 
 纹理贴图主要的难点在于针对不同几何体实现纹理映射。
 
@@ -392,13 +540,38 @@ textureMap(float objectX, float objectY, float objectZ, int textureWidth, int te
 }
 ```
 
-同时，三角面片支持透射效果。即对应像素的`alpha`通道值（透明度）小于一定阈值时，认为与该三角面片没有交点，继续进行求交。（详见渲染结果部分的树叶效果）
+同时，三角面片支持**透射效果**。即对应像素的`alpha`通道值（透明度）小于一定阈值时，认为与该三角面片没有交点，继续进行求交。（详见渲染结果部分的树叶效果）
 
 
 
-### 景深 （中）
+### 法向插值
 
-利用相机物理成像原理实现景深效果：增加“光圈”和“焦平面”两个参数，射出光线时，保持焦平面上的点不动，在光圈上随机采样作为光线射出点。这样，不在焦平面上的物体将模糊，而位于焦平面附近的物体受影响较小。
+若光线与三角面片有交点，其法向量按如下规则计算：
+$$
+\vec n' = \alpha \vec n_a + \beta \vec n_b + \gamma \vec n_c
+$$
+其中，$(\alpha, \beta, \gamma)$为该点的重心坐标，$\vec n_a, \vec n_b, \vec n_c$分别为三个顶点处的法向量。
+
+<div align='center'>
+    <img src="./assets/7_interpolation.bmp" alt="7_interpolation" style="zoom:33%;" />
+    <img src="./assets/8_no_interpolation.bmp" alt="8_no_interpolation" style="zoom:33%;" />
+</div>
+
+<div align='center'>
+    法向插值（左）与不插值（右）效果对比，法向插值使着色更平滑
+</div>
+
+
+
+### 景深
+
+利用相机物理成像原理实现景深效果：增加**“光圈”**和**“焦平面”**两个参数，射出光线时，保持焦平面上的点不动，在光圈上随机采样作为光线射出点。这样，不在焦平面上的物体将模糊，而位于焦平面附近的物体受影响较小。
+
+<img src="./assets/3_depth.bmp" alt="3_depth" style="zoom:50%;" />
+
+<div align='center'>
+    景深效果，能够明显看到前面的光源和兔子比后面的模糊
+</div>
 
 ```c++
 /**
@@ -446,7 +619,7 @@ private:
 
 
 
-### 求交加速 （高）
+### 求交加速
 
 #### AABB包围盒
 
@@ -458,7 +631,7 @@ private:
 
 ##### 构建逻辑
 
-当目前三角形的数目少于`LEAF_SIZE`时，建立叶节点。否则，找到所有三角形中对应坐标轴中最小坐标的中位数，执行二分。若二分失败，也建立叶节点。
+当前三角形的数目少于`LEAF_SIZE`时，建立叶节点。否则，找到所有三角形中对应坐标轴中最小坐标的中位数，执行二分。若二分失败，也建立叶节点。
 
 ```c++
 // left : lb <= pivot
@@ -570,7 +743,7 @@ bool BSPTree::intersect(BSPTree::Node *node, const Ray &r, Hit &h, float tmin, f
 
 
 
-### 参数曲面解析求交 （高）
+### 参数曲面解析求交
 
 受PA2习题课启发，对于射线与曲面相交的事件，可以列出方程：
 $$
@@ -596,6 +769,17 @@ $$
 (x'(t), y'(t), 0)
 $$
 计算法向量。
+
+<div align='center'>
+    <img src="./assets/4_vase.bmp" alt="4_vase" style="zoom:33%;" />
+    <img src="./assets/5_vase_mesh.bmp" alt="5_vase_mesh" style="zoom:33%;" />
+</div>
+
+<div align='center'>
+    参数求交（左）与三角网络（右）效果对比，可以明显看出左图的平滑性
+</div>
+
+
 
 ```c++
 /**
@@ -717,31 +901,11 @@ inline void fdf(const Ray &r, float t, float &f, float &df) {
 
 
 
-## 渲染结果
+### 硬件加速
 
-其实本来打算只交一张图的，但是整合景深的话不好看，加上参数曲面求交又太慢了，所以准备交这三张图。后面两张图仅表明“景深”和“参数曲面求交”实现的正确性。
+简单地基于`OPENMP`调用多线程加速。
 
-### 主效果
 
-场景共`116,198`个面片，分辨率`1920*1920`，渲染时间约`7`小时。
-
-![0_final](./assets/0_final.bmp)
-
-场景文件来自 [3D Models Free Download - Open3dModel.com](https://open3dmodel.com/)
-
-### 景深示例
-
-可以看到，前面的光源和兔子明显模糊了。
-
-![3_depth](./assets/3_depth.bmp)
-
-### 参数曲面求交示例
-
-容易看出求交的平滑性。
-
-![4_vase](./assets/4_vase.bmp)
-
-贴图来源：花瓶贴图用的是往年学长的，但是求交代码是独立实现的（部分参考了PA2习题课PPT）。
 
 ## 参考代码
 
