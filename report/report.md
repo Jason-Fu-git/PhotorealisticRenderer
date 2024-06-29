@@ -16,7 +16,7 @@
 
 ## 基础功能实现
 
-实现了Whitted-style光线追踪，支持反射、折射和阴影。基于`smallpt`实现了路径追踪，支持面光源，漫反射，理想反射，折射，glossy材质等。并且针对方向光源、点光源、球面光源做了`NEE`。
+实现了`whitted-style`光线追踪，支持反射、折射和阴影。基于`smallpt`实现了路径追踪，支持面光源，漫反射，理想反射，折射，`glossy`材质等。并且针对方向光源、点光源、球面光源做了`NEE`。
 
 ### 效果对比
 
@@ -286,13 +286,13 @@ public:
     }
 ```
 
-#### glossy材质逻辑
+#### `glossy`材质逻辑
 
-验收的时候没写glossy材质，所以这里把图给补上。
+验收的时候没写`glossy`材质，所以这里把图给补上。
 
 <img src="./assets/6_glossy.bmp" alt="6_glossy" style="zoom:33%;" />
 
-glossy材质基于`Cook Torrance Model`实现，分布选用`GGX`，菲涅尔项和几何衰减项均使用`Schlick`法近似。这里展示该模型的代码：
+`glossy`材质基于`Cook Torrance Model`实现，分布选用`GGX`，菲涅尔项和几何衰减项均使用`Schlick`法近似。这里展示该模型的代码：
 
 ```c++
 /**
@@ -421,7 +421,7 @@ protected:
 
 ### 抗锯齿 
 
-抗锯齿方法使用SSAA（Supersampling Anti-Aliasing），对每一个像素采样2*2的子像素，最后取平均。受`smallpt`启发，采样时使用`tent filter`，即基于函数
+抗锯齿方法使用`SSAA（Supersampling Anti-Aliasing）`，对每一个像素采样`2*2`的子像素，最后取平均。受`smallpt`启发，采样时使用`tent filter`，即基于函数
 $$
 f(x) = \begin{cases}
  \sqrt{x} - 1 \ \ \ &0 \leq   x  < 1 \\
@@ -461,7 +461,7 @@ for (int sx = 0; sx < 2; sx++) {
 
 #### 平面
 
-在平面上取一点建立xOy坐标系，将纹理坐标直接映射到该坐标系中。对于超出长宽范围的坐标，返回取模后的结果。
+在平面上取一点建立`xOy`坐标系，将纹理坐标直接映射到该坐标系中。对于超出长宽范围的坐标，返回取模后的结果。
 
 ```c++
 std::pair<int, int>
@@ -570,8 +570,9 @@ $$
 <img src="./assets/3_depth.bmp" alt="3_depth" style="zoom:50%;" />
 
 <div align='center'>
-    景深效果，能够明显看到前面的光源和兔子比后面的模糊
+    景深效果，能够明显看到前面的兔子比后面的模糊
 </div>
+
 
 ```c++
 /**
@@ -707,23 +708,26 @@ bool BSPTree::intersect(BSPTree::Node *node, const Ray &r, Hit &h, float tmin, f
         }
         // non-leaf node, first calculate distance
         float t = r.parameterAtPoint(node->split, node->axis);
+
         // then judge the near and far side
         Node *near = node->lc, *far = node->rc;
         if (node->axis == Ray::X_AXIS && r.getOrigin()[Ray::X_AXIS] > node->split) {
             near = node->rc;
             far = node->lc;
-        } else if (node->axis == Ray::Y_AXIS && r.getOrigin()[Ray::Y_AXIS] > node->split) 
-        {
+        } else if (node->axis == Ray::Y_AXIS && r.getOrigin()[Ray::Y_AXIS] > node->split) {
             near = node->rc;
             far = node->lc;
-        } else if (node->axis == Ray::Z_AXIS && r.getOrigin()[Ray::Z_AXIS] > node->split) 
-        {
+        } else if (node->axis == Ray::Z_AXIS && r.getOrigin()[Ray::Z_AXIS] > node->split) {
             near = node->rc;
             far = node->lc;
         }
 
         // finally calculate intersection
-        if (t > tmax + TOLERANCE || t < -TOLERANCE)
+        if (t >= -TOLERANCE && t <= TOLERANCE) {
+            // the origin almost lies in the split plane
+            isIntersect |= intersect(near, r, h, tmin, tmax);
+            isIntersect |= intersect(far, r, h, tmin, tmax);
+        } else if (t > tmax + TOLERANCE || t < -TOLERANCE)
             isIntersect |= intersect(near, r, h, tmin, tmax);
         else if (t < tmin - TOLERANCE)
             isIntersect |= intersect(far, r, h, tmin, tmax);
@@ -733,6 +737,7 @@ bool BSPTree::intersect(BSPTree::Node *node, const Ray &r, Hit &h, float tmin, f
             isIntersect |= intersect(far, r, h, t, tmax);
         }
     }
+
     return isIntersect;
 }
 ```
@@ -759,7 +764,7 @@ $$
 $$
 t = t - \mu * f/f'
 $$
-其中$\mu$为超参数，程序中取为0.1。
+其中$\mu$为超参数，程序中取为0.1，避免函数上凸时跨步过大。
 
 牛顿法迭代的初值设为$t$能够取到的最小值和最大值，再从得到的解中筛选离光源最近的那个。
 
