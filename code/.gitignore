@@ -1,4 +1,8 @@
 /build
 /output
 /scratch
+../.idea
 /cmake-build-debug
+/cmake-build-cuda
+cuda/cmake-build-debug
+cuda/cmake-build-cuda
