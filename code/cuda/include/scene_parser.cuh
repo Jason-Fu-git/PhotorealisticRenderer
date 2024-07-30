@@ -73,6 +73,8 @@ private:
 
     Triangle *parseTriangle();
 
+    Mesh *parseTriangleMesh();
+
     Transform *parseTransform();
 
     Group *parseObjFile(const char *filename, int materialType);

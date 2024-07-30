@@ -30,6 +30,8 @@
 
 - Solve Ray-surface Intersection using Newton’s Method (beta)
 
+- CUDA Acceleration (beta)
+
 - `.obj` File Parser
 
   

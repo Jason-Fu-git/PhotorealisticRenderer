@@ -4,22 +4,22 @@
 
 #include "light.cuh"
 
-__global__ void createDirectionalLightOnDevice(Light **lights, const Vector3f &d, const Vector3f &c) {
+__global__ void createDirectionalLightOnDevice(Light **light, Vector3f d, Vector3f c) {
     if (threadIdx.x == 0 && blockIdx.x == 0) {
         // single pointer case
-        *lights = new DirectionalLight(d, c);
+        *light = new DirectionalLight(d, c);
     }
 }
 
-__global__ void createPointLightOnDevice(Light **lights, const Vector3f &p, const Vector3f &c) {
+__global__ void createPointLightOnDevice(Light **light, Vector3f p, Vector3f c) {
     if (threadIdx.x == 0 && blockIdx.x == 0) {
-        *lights = new PointLight(p, c);
+        *light = new PointLight(p, c);
     }
 }
 
-__global__ void createSphereLightOnDevice(Light **lights, const Vector3f &p, float r, const Vector3f &c) {
+__global__ void createSphereLightOnDevice(Light **light, Vector3f p, float r, Vector3f c) {
     if (threadIdx.x == 0 && blockIdx.x == 0) {
-        *lights = new SphereLight(p, r, c);
+        *light = new SphereLight(p, r, c);
     }
 }
 

@@ -7,6 +7,7 @@
 #define FINALPROJECT_BOUNDINGBOX_HPP
 
 #include <cfloat>
+#include <cstdio>
 #include "ray.cuh"
 
 #define MINUS_T (-0.01)
@@ -88,7 +89,6 @@ public:
             intersect = true;
             tmin = MINUS_T;
         }
-
         return intersect;
     }
 

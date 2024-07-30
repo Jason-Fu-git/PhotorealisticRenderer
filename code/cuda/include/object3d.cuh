@@ -78,7 +78,7 @@ createSphereOnDevice(Object3D **object, Material **materials, int materialIndex,
 
 __global__ void
 createTriangleOnDevice(Object3D **object, Material **materials, int materialIndex,
-                       Vector3f a, Vector3f b, Vector3f c,
+                       Vector3f a, Vector3f b, Vector3f c, Vector3f normal,
                        float au, float av, float bu, float bv, float cu, float cv,
                        Vector3f an, Vector3f bn, Vector3f cn);
 
@@ -86,13 +86,13 @@ __global__ void
 createTransformOnDevice(Object3D **object, Matrix4f m, Object3D **obj);
 
 __global__ void
-createMeshOnDevice(Object3D **object, Triangle **trigs, int trigSize);
+createMeshOnDevice(Object3D **object, Material **materials, Triangle *trigs, int trigSize);
 
 __global__ void
 createGroupOnDevice(Group **object, int groupSize);
 
 __global__ void
-addObjectToGroup(Object3D** object, Group **group);
+addObjectToGroup(Object3D **object, Group **group);
 
 __global__ void
 freeGroupOnDevice(Group **group);

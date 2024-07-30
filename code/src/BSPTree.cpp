@@ -6,6 +6,7 @@
 #include "BSPTree.hpp"
 #include "ray.hpp"
 #include "object3d.hpp"
+
 #include <algorithm>
 #include <cmath>
 

@@ -46,6 +46,58 @@ public:
         _cn = Vector3f::ZERO();
     }
 
+    __device__ inline bool intersectTriangle(const Ray &ray, Hit &hit, float tmin) {
+        float original_length = ray.getDirection().length();
+        // Using areal coordinates
+        Vector3f E1 = _a - _b;
+        Vector3f E2 = _a - _c;
+        Vector3f S = _a - ray.getOrigin();
+        float det1 = Matrix3f(ray.getDirection().normalized(), E1, E2).determinant();
+        if (det1 != 0) // valid solution
+        {
+            float t = Matrix3f(S, E1, E2).determinant() / det1 / original_length;
+            float beta = Matrix3f(ray.getDirection().normalized(), S, E2).determinant() / det1;
+            float gamma = Matrix3f(ray.getDirection().normalized(), E1, S).determinant() / det1;
+
+            if (t > 0 && beta >= 0 && gamma >= 0 && beta + gamma <= 1) { // has intersection
+                if (hit.getT() > t && t >= tmin) {
+
+                    float alpha = 1 - beta - gamma;
+
+                    // update texture data
+                    if (au != 100) {
+                        u = mod(alpha * au + beta * bu + gamma * cu, 1);
+                        v = mod(alpha * av + beta * bv + gamma * cv, 1);
+
+                        // judge whether transmitted
+                        // if the alpha on the texture is less than the given threshold, this means it transmits
+                        if (material->isTransmit(u, v))
+                            return false;
+                    }
+
+                    // Judge whether the intersection is inside the triangle
+                    Vector3f _normal = normal;
+                    bool isInside = false;
+
+                    // if vertex normal is specified, use normal interpolation
+                    if (_an != Vector3f::ZERO()) {
+                        _normal = (_an * alpha + _bn * beta + _cn * gamma).normalized();
+                    }
+
+                    if (Vector3f::dot(normal, ray.getDirection()) > 0) {
+                        _normal = -normal;
+                        isInside = true;
+                    }
+
+                    // 更新hit
+                    hit.set(t, this, _normal.normalized(), isInside);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 
     __device__ inline bool intersect(const Ray &ray, Hit &hit, float tmin) override {
         float original_length = ray.getDirection().length();
@@ -121,7 +173,6 @@ public:
                 (int) floorf(v * textureHeight)
         };
     }
-
 
     __device__ __host__ inline float getLowerBound(int axis) override {
         return fminf(fminf(_a[axis], _b[axis]), _c[axis]);

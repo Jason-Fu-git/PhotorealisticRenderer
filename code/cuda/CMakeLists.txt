@@ -51,7 +51,8 @@ set(SOURCES src/main.cu
         src/transform.cu
         src/Matrix4f.cu
         src/Vector4f.cu
-        src/renderer.cu)
+        src/renderer.cu
+)
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${INCLUDES})
 

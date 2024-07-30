@@ -30,9 +30,8 @@ void Renderer::render() {
     // Loop over each pixel in the image, shooting a ray through that pixel .
     // Write the color at the intersection to that pixel in your output image.
     assert(width % 16 == 0 && height % 16 == 0);
-    assert(samples % 4 == 0);
 
-    dim3 gridSize(width / 16, height / 16, samples / 4);
+    dim3 gridSize(width / 16, height / 16, samples);
     dim3 blockSize(16, 16, 1);
 
     // render

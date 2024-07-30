@@ -48,6 +48,11 @@ public:
         Ray tr(trSource, trDirection);
         bool inter = o->intersect(tr, h, tmin);
         if (inter) {
+//            printf("Ray r o: %f %f %f d : %f %f %f "
+//                   "Ray tr o: %f %f %f d : %f %f %f \n", r.getOrigin().x(), r.getOrigin().y(), r.getOrigin().z(),
+//                   r.getDirection().x(), r.getDirection().y(), r.getDirection().z(),
+//                   tr.getOrigin().x(), tr.getOrigin().y(), tr.getOrigin().z(),
+//                   tr.getDirection().x(), tr.getDirection().y(), tr.getDirection().z());
             h.set(h.getT(), h.getMaterial(), transformDirection(transform.transposed(), h.getNormal()).normalized(),
                   h.isInside());
         }

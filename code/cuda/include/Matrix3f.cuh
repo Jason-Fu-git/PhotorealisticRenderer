@@ -197,11 +197,10 @@ public:
     }
 
     __device__ __host__ inline float determinant() const {
-        return (
-                m_elements[0] * (m_elements[4] * m_elements[8] - m_elements[5] * m_elements[7])
-                - m_elements[1] * (m_elements[3] * m_elements[8] - m_elements[5] * m_elements[6])
-                + m_elements[2] * (m_elements[3] * m_elements[7] - m_elements[4] * m_elements[6])
-        );
+        return determinant3x3(m_elements[0], m_elements[3], m_elements[6],
+                              m_elements[1], m_elements[4], m_elements[7],
+                              m_elements[2], m_elements[5], m_elements[8]);
+
     }
 
     __device__ __host__ static float inline determinant3x3(float m00, float m01, float m02,

@@ -50,20 +50,25 @@ createSphereOnDevice(Object3D **object, Material **materials, int materialIndex,
 
 __global__ void
 createTriangleOnDevice(Object3D **object, Material **materials, int materialIndex, Vector3f a, Vector3f b,
-                       Vector3f c, float au, float av, float bu, float bv, float cu, float cv,
+                       Vector3f c, Vector3f normal, float au, float av, float bu, float bv, float cu, float cv,
                        Vector3f an, Vector3f bn, Vector3f cn) {
     if (blockIdx.x == 0 && threadIdx.x == 0) {
         auto triangle = new Triangle(a, b, c, materials[materialIndex], -1);
         triangle->setVertexNormals(an, bn, cn);
         triangle->setTextureUV(au, av, bu, bv, cu, cv);
+        triangle->normal = normal;
         *object = triangle;
     }
 }
 
 __global__ void
-createMeshOnDevice(Object3D **object, Triangle **trigs, int trigSize) {
+createMeshOnDevice(Object3D **object, Material **materials, Triangle *trigs, int trigSize) {
     if (blockIdx.x == 0 && threadIdx.x == 0) {
-        *object = new Mesh(*trigs, trigSize);
+        //set materials for each triangle
+        for (int i = 0; i < trigSize; i++) {
+            trigs[i].setMaterial(materials[trigs[i].getMaterialIndex()]);
+        }
+        *object = new Mesh(trigs, trigSize);
     }
 }
 
@@ -75,7 +80,7 @@ __global__ void createGroupOnDevice(Group **object, int groupSize) {
 
 __global__ void createTransformOnDevice(Object3D **object, Matrix4f m, Object3D **obj) {
     if (blockIdx.x == 0 && threadIdx.x == 0) {
-        *object = new Transform(m, *obj);
+        *object = new Transform(m.inverse(), *obj);
     }
 }
 

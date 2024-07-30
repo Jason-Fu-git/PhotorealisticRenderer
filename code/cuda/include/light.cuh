@@ -20,7 +20,7 @@ class Light {
 public:
     __device__ __host__ inline Light() = default;
 
-    __device__ __host__ inline virtual ~Light() = default;
+    __device__ __host__ inline virtual ~Light() {}
 
     /**
      * Get the illumination intensity at a given point p
@@ -54,7 +54,7 @@ public:
         color = c;
     }
 
-    __device__ __host__ inline ~DirectionalLight() override = default;
+    __device__ __host__ inline ~DirectionalLight() override {}
 
     ///@param p not used in this function
     ///@param distanceToLight not well defined because it's not a point light
@@ -96,7 +96,7 @@ public:
         color = c;
     }
 
-    __device__ __host__ inline ~PointLight() override = default;
+    __device__ __host__ inline ~PointLight() override {}
 
     __device__ inline void
     getIllumination(const Vector3f &p, Vector3f &dir, Vector3f &col, curandState *state) const override {
@@ -143,7 +143,7 @@ public:
     __device__ __host__ inline SphereLight(const Vector3f &p, float r, const Vector3f &e_color)
             : position(p), radius(r), emissionColor(e_color) {}
 
-    __device__ __host__ inline ~SphereLight() override = default;
+    __device__ __host__ inline ~SphereLight() override {}
 
     // NOTE : the color it returns should be multiplied by <dir, normal> externally
     __device__ inline void
@@ -208,12 +208,12 @@ private:
     Vector3f emissionColor;
 };
 
-__global__ void createDirectionalLightOnDevice(Light **light, const Vector3f &d, const Vector3f &c);
+__global__ void createDirectionalLightOnDevice(Light **light, Vector3f d, Vector3f c);
 
-__global__ void createPointLightOnDevice(Light **light, const Vector3f &p, const Vector3f &c);
+__global__ void createPointLightOnDevice(Light **light, Vector3f p, Vector3f c);
 
 __global__ void
-createSphereLightOnDevice(Light **light, const Vector3f &p, float r, const Vector3f &c);
+createSphereLightOnDevice(Light **light, Vector3f p, float r, Vector3f c);
 
 __global__ void freeLightOnDevice(Light **light);
 

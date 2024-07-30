@@ -1,0 +1,11 @@
+/code/build
+/code/scratch
+/code/output
+/.idea
+/code/cmake-build-debug
+/code/cmake-build-cuda
+/code/cuda/cmake-build-debug
+/code/cuda/cmake-build-cuda
+/code/cuda/build
+/code/cuda/scratch
+/code/cuda/output

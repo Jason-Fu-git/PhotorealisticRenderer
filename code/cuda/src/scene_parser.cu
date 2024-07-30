@@ -515,6 +515,8 @@ Object3D *SceneParser::parseObject(char token[MAX_PARSER_TOKEN_LENGTH]) {
         answer = (Object3D *) parseTriangle();
     } else if (!strcmp(token, "Transform")) {
         answer = (Object3D *) parseTransform();
+    } else if (!strcmp(token, "TriangleMesh")) {
+        answer = (Object3D *) parseTriangleMesh();
     } else {
         printf("Unknown token in parseObject: '%s'\n", token);
         exit(0);
@@ -810,6 +812,29 @@ Triangle *SceneParser::parseTriangle() {
     return new Triangle(v0, v1, v2, materials[currentMaterialIndex], currentMaterialIndex);
 }
 
+
+/**
+ * @copybrief 清华大学计算机图形学课程提供框架
+ *
+ */
+Mesh *SceneParser::parseTriangleMesh() {
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    char filename[MAX_PARSER_TOKEN_LENGTH];
+    // get the filename
+    getToken(token);
+    assert(!strcmp(token, "{"));
+    getToken(token);
+    assert(!strcmp(token, "obj_file"));
+    getToken(filename);
+    getToken(token);
+    assert(!strcmp(token, "}"));
+    const char *ext = &filename[strlen(filename) - 4];
+    assert(!strcmp(ext, ".obj"));
+    Mesh *answer = new Mesh(filename, currentMaterialIndex);
+
+    return answer;
+}
+
 /**
  * @copybrief 清华大学计算机图形学课程提供框架
  *
@@ -960,7 +985,7 @@ Group **SceneParser::groupHostToDevice(Group *hGroup) {
                                            sphere->getThetaOffset(), sphere->getPhiOffset());
         } else if (auto triangle = dynamic_cast<Triangle *>(object)) {
             createTriangleOnDevice<<<1, 1>>>(dObject, deviceMaterials, triangle->getMaterialIndex(),
-                                             triangle->getA(), triangle->getB(), triangle->getC(),
+                                             triangle->getA(), triangle->getB(), triangle->getC(), triangle->normal,
                                              triangle->au, triangle->av, triangle->bu, triangle->bv,
                                              triangle->cu, triangle->cv, triangle->_an, triangle->_bn, triangle->_cn);
         } else if (auto mesh = dynamic_cast<Mesh *>(object)) {
@@ -968,7 +993,7 @@ Group **SceneParser::groupHostToDevice(Group *hGroup) {
             Triangle *hTriangles = mesh->getTriangles();
             cudaMalloc(&dTriangles, sizeof(Triangle) * mesh->getSize());
             cudaMemcpy(dTriangles, hTriangles, sizeof(Triangle) * mesh->getSize(), cudaMemcpyHostToDevice);
-            createMeshOnDevice<<<1, 1>>>(dObject, &dTriangles, mesh->getSize());
+            createMeshOnDevice<<<1, 1>>>(dObject, deviceMaterials, dTriangles, mesh->getSize());
         } else if (auto transform = dynamic_cast<Transform *>(object)) {
             auto obj = transform->getObject();
             auto dObj = createObjectOnDevice(obj);
@@ -996,7 +1021,7 @@ Group **SceneParser::groupHostToDevice(Group *hGroup) {
 
 Object3D **SceneParser::createObjectOnDevice(Object3D *object) {
     Object3D **dObject;
-    cudaMalloc(&dObject, sizeof(Object3D **));
+    auto err = cudaMalloc(&dObject, sizeof(Object3D **));
     if (auto plane = dynamic_cast<Plane *>(object)) {
         createPlaneOnDevice<<<1, 1>>>(dObject, deviceMaterials, plane->getMaterialIndex(),
                                       plane->getNormal(), plane->getD(), plane->getScale());
@@ -1006,20 +1031,21 @@ Object3D **SceneParser::createObjectOnDevice(Object3D *object) {
                                        sphere->getThetaOffset(), sphere->getPhiOffset());
     } else if (auto triangle = dynamic_cast<Triangle *>(object)) {
         createTriangleOnDevice<<<1, 1>>>(dObject, deviceMaterials, triangle->getMaterialIndex(),
-                                         triangle->getA(), triangle->getB(), triangle->getC(),
+                                         triangle->getA(), triangle->getB(), triangle->getC(), triangle->normal,
                                          triangle->au, triangle->av, triangle->bu, triangle->bv,
                                          triangle->cu, triangle->cv, triangle->_an, triangle->_bn, triangle->_cn);
     } else if (auto mesh = dynamic_cast<Mesh *>(object)) {
+        fflush(stdout);
         Triangle *dTriangles;
         Triangle *hTriangles = mesh->getTriangles();
-        cudaMalloc(&dTriangles, sizeof(Triangle) * mesh->getSize());
-        cudaMemcpy(dTriangles, hTriangles, sizeof(Triangle) * mesh->getSize(), cudaMemcpyHostToDevice);
-        createMeshOnDevice<<<1, 1>>>(dObject, &dTriangles, mesh->getSize());
+        err = cudaMalloc(&dTriangles, sizeof(Triangle) * mesh->getSize());
+        err = cudaMemcpy(dTriangles, hTriangles, sizeof(Triangle) * mesh->getSize(), cudaMemcpyHostToDevice);
+        createMeshOnDevice<<<1, 1>>>(dObject, deviceMaterials, dTriangles, mesh->getSize());
     } else {
         fprintf(stderr, "Unsupported object type\n");
     }
 
-    auto err = cudaDeviceSynchronize();
+    err = cudaDeviceSynchronize();
     if (err != cudaSuccess) {
         printf("Error creating group on device : %s\n", cudaGetErrorString(err));
     }
